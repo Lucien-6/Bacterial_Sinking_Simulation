@@ -83,7 +83,7 @@ ExlcudeData = VM(:,7)<Tlim(1) | VM(:,7)>Tlim(2);
 [fo,gof] = fit(VM(:,7),VM(:,8),'poly2','Lower',[0 0 0],'Upper',[Inf Inf 0],'Exclude',ExlcudeData);
 L3 = plot(fo,'--r',VM(:,7),VM(:,8),'-b',ExlcudeData,'.b');
 set(gca,'FontName','Times New Roman')
-L3(1).LineWidth = 2.0;
+L3(1).LineWidth = 3.0;
 L3(2).MarkerSize = 1.0;
 grid on
 ax = gca; ax.LineWidth = 1.5;
