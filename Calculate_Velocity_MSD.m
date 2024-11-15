@@ -65,7 +65,7 @@ grid on
 ax = gca; ax.LineWidth = 1.5;
 ax.FontSize = 12;
 title('Mean-Square Displacement','FontSize',24,'FontWeight','bold')
-xlabel('Δt (s)','FontSize',18);ylabel('MSD (μm^2/s)','FontSize',18);
+xlabel('Δt (s)','FontSize',18);ylabel('MSD (μm^2)','FontSize',18);
 xlim([VM(1,1) 1.5*VM(end,1)])
 %Plot a reference straight line segment with a slope of 1
 hold on
@@ -83,13 +83,13 @@ ExlcudeData = VM(:,7)<Tlim(1) | VM(:,7)>Tlim(2);
 [fo,gof] = fit(VM(:,7),VM(:,8),'poly2','Lower',[0 0 0],'Upper',[Inf Inf 0],'Exclude',ExlcudeData);
 L3 = plot(fo,'--r',VM(:,7),VM(:,8),'-b',ExlcudeData,'.b');
 set(gca,'FontName','Times New Roman')
-L3(1).LineWidth = 2.0;
+L3(1).LineWidth = 3.0;
 L3(2).MarkerSize = 1.0;
 grid on
 ax = gca; ax.LineWidth = 1.5;
 ax.FontSize = 12;
 title('Fitted curve of MSD','FontSize',24,'FontWeight','bold')
-xlabel('Δt (s)','FontSize',18);ylabel('MSD (μm^2/s)','FontSize',18);
+xlabel('Δt (s)','FontSize',18);ylabel('MSD (μm^2)','FontSize',18);
 legend({'Simulation Data','Exlcude Data','Fitted Curve'},'FontSize',16,'Location','southeast')
 latexf = ['$${\bf y}=6*',num2str(fo.p2/6),'*\Delta{\bf t}+',num2str(sqrt(fo.p1)),'^2*\Delta{\bf t}^2, ' ...
     'R^2=',num2str(gof.adjrsquare),' \rightarrow $$'];
