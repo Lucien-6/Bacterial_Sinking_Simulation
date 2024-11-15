@@ -65,7 +65,7 @@ grid on
 ax = gca; ax.LineWidth = 1.5;
 ax.FontSize = 12;
 title('Mean-Square Displacement','FontSize',24,'FontWeight','bold')
-xlabel('Δt (s)','FontSize',18);ylabel('MSD (μm^2)','FontSize',18);
+xlabel('Δt (s)','FontSize',18);ylabel('MSD (μm^2/s)','FontSize',18);
 xlim([VM(1,1) 1.5*VM(end,1)])
 %Plot a reference straight line segment with a slope of 1
 hold on
@@ -89,7 +89,7 @@ grid on
 ax = gca; ax.LineWidth = 1.5;
 ax.FontSize = 12;
 title('Fitted curve of MSD','FontSize',24,'FontWeight','bold')
-xlabel('Δt (s)','FontSize',18);ylabel('MSD (μm^2)','FontSize',18);
+xlabel('Δt (s)','FontSize',18);ylabel('MSD (μm^2/s)','FontSize',18);
 legend({'Simulation Data','Exlcude Data','Fitted Curve'},'FontSize',16,'Location','southeast')
 latexf = ['$${\bf y}=6*',num2str(fo.p2/6),'*\Delta{\bf t}+',num2str(sqrt(fo.p1)),'^2*\Delta{\bf t}^2, ' ...
     'R^2=',num2str(gof.adjrsquare),' \rightarrow $$'];
