@@ -1,70 +1,59 @@
 function VarCell = Extract_Var_from_Files(regexPattern,VarName)
-    % extract_Var_from_mat_files
-    % 该函数从用户指定的文件夹及其子文件夹中加载符合特定命名形式的.mat文件，
-    % 并提取每个文件中命名为VarName的变量。
-    % 用户将通过文件选择对话框选择文件夹。
-    % 文件命名形式为regexPattern, 例如"data_XXXX.mat"，其中XXXX为数字。
-    % 相应的正则化表达式为regexPattern = 'data_\d{4}\.mat'。
-
-    % 打开文件选择对话框，让用户选择文件夹
-    folderPath = uigetdir('', '选择包含所需.mat文件的文件夹');
-    
-    % 检查用户是否取消了选择
+    % Extract_Var_from_Files
+    % This function loads .mat files with a specific naming format from the user-specified folder and its subfolders,
+    % and extracts the variable named VarName from each file.
+    % The user will select the folder using a file selection dialog.
+    % The file naming format is regexPattern, for example "data_XXXX.mat", where XXXX is a number.
+    % The corresponding regular expression is regexPattern = 'data_\d{4}\.mat'.
+    % Open the file selection dialog for the user to choose a folder
+    folderPath = uigetdir('', 'Select the folder containing the required .mat files');
+    % Check if the user canceled the selection
     if isequal(folderPath, 0)
-        disp('未选择文件夹，程序退出。');
+        disp('No folder selected, program exits.');
         return;
     end
-    
-    % 调用递归函数遍历文件夹和子文件夹
+    % Call the recursive function to traverse folders and subfolders
     VarCell = recursive_extract_Var(folderPath, regexPattern,VarName);
-    
-    % 检查是否提取了Var变量
+    % Check if the Var variable has been extracted
     if ~isempty(VarCell)
-        disp(['所有符合条件的文件中的',VarName,'变量已提取!']);
+        disp(['Variable ', VarName, ' has been extracted from all qualifying files!']);
     else
-        disp(['没有找到符合命名形式的文件或文件中不包含',VarName,'变量!']);
+        disp(['No files with the correct naming format were found or the files do not contain the ', VarName, ' variable!']);
     end
-    
 end
-
 function VarCell = recursive_extract_Var(folderPath, regexPattern,VarName)
     % recursive_extract_Var
-    % 递归函数，用于遍历文件夹和子文件夹，加载符合命名形式的.mat文件，
-    % 并提取每个文件中命名为"VarName"的变量。
-    
-    % 初始化输出细胞数组
+    % Recursive function to traverse folders and subfolders, load .mat files with the correct naming format,
+    % and extract the variable named "VarName" from each file.
+    % Initialize the output cell array
     VarCell = {};
-    
-    % 获取指定文件夹下的所有文件和文件夹
+    % Get all files and folders in the specified folder
     items = dir(folderPath);
-    
-    % 遍历所有项
+    % Loop through all items
     for i = 1:length(items)
-        % 构建完整的路径
+        % Construct the full path
         fullPath = fullfile(folderPath, items(i).name);
-        
-        % 检查是文件还是文件夹
+        % Check if it is a file or a folder
         if items(i).isdir
-            % 如果是文件夹，且不是'.'或'..'，递归调用
+            % If it is a folder, and not '.' or '..', recursively call
             if ~isequal(items(i).name, '.') && ~isequal(items(i).name, '..')
                 subVarCell = recursive_extract_Var(fullPath, regexPattern,VarName);
-                % 将子文件夹中的Var变量合并到主细胞数组
+                % Merge the Var variables from the subfolder into the main cell array
                 VarCell = [VarCell;subVarCell];
             end
         else
-            % 如果是文件，检查文件名是否符合正则表达式
+            % If it is a file, check if the file name matches the regular expression
             if regexp(items(i).name, regexPattern)
-                % 检查文件是否包含Var变量
+                % Check if the file contains the Var variable
                 variables = load(fullPath);
                 variableNames = fieldnames(variables);
                 if ismember(VarName, variableNames)
-                    % 如果包含Var变量，加载该变量
+                    % If it contains the Var variable, load the variable
                     VarCell{end+1} = variables.(VarName);
-                    
-                    % 显示提取的文件名
-                    disp(['提取文件：' items(i).name '中的',VarName,'变量']);
+                    % Display the name of the extracted file
+                    disp(['Extracted variable ', VarName, ' from file: ' items(i).name]);
                 else
-                    disp(['文件：' items(i).name '不包含',VarName,'变量']);
+                    disp(['File: ' items(i).name ' does not contain the ', VarName, ' variable']);
                 end
             end
         end
