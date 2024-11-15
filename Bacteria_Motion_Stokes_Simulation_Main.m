@@ -6,10 +6,10 @@ their derived units. This program was created based on the modification of
 the original program by Prof. Yang Ding of the Beijing Computational Science
 Research Center.
 
-#Creator: Lucien            #Created: Oct. 10, 2024
-#Modified by: Lucien       #Last modification time: Nov. 12, 2024
+#Creator: Lucien            #Creation time: Oct. 10, 2024
+#Modified by: Lucien       #Last modified time: Nov. 12, 2024
 
-#Modification record:
+#Modify records:
 ----------------------------- V1.0 --------------------------
 1. Bacterial velocity and MSD calculation analysis added.
 2. Set the mean of random force to 0 through translation.
