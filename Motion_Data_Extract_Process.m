@@ -66,10 +66,6 @@ end
 Mean_MSD = mean(MSD,2);
 RDC = diff(Mean_MSD)/(6*(Times(2)-Times(1)));
 
-MPD = struct('Sinking_Velocity',Sinking_Velocity,'Mean_Velocity',Mean_Velocity, ...
-    'Fractal_Dimension',Fractal_Dimension);
-save([Output_Path,'/',Case_Name,'/',Case_Name,'_Motion Post-Data.mat'],'MPD')
-
 %% Draw corresponding result charts
 
 figure('Name','MSD Curves')
@@ -118,6 +114,10 @@ text(Tlim(2),fo(Tlim(2)),latexf,'Interpreter','latex','FontSize',14,'Color','k',
 saveas(gcf,[Output_Path,'/',Case_Name,'/',Case_Name,'_Fitted-MSD'],'png')%Save this figure
 
 %% Post processing completed, reporting time
+
+MPD = struct('Sinking_Velocity',Sinking_Velocity,'Mean_Velocity',Mean_Velocity, ...
+    'Fractal_Dimension',Fractal_Dimension,'Diffusion_Coefficient',fo.p2/6,'FSV',sqrt(fo.p1));
+save([Output_Path,'/',Case_Name,'/',Case_Name,'_Motion Post-Data.mat'],'MPD')
 
 Run_Time = toc(Start1);
 fprintf('All motion data post-processed in %.2f seconds.\n',Run_Time)
