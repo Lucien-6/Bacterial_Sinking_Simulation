@@ -5,10 +5,10 @@ the "Bacterial Motion Stokes Simulation" project, ultimately obtaining chart inf
 such as instantaneous velocity, settling velocity, MSD, diffusion coefficient, etc.
 
 #Creator: Lucien            #Creation time: Nov. 15, 2024
-#Modified by:       #Last modified time: 
+#Modified by: Lucien     #Last modified time: Nov. 16, 2024
 
 #Modify records:
-1. 
+1. Added average instantaneous velocity and fractal dimension analysis functions.
 
 %}
 
@@ -30,7 +30,7 @@ mkdir(Output_Path,Case_Name)
 %% Related parameter settings
 
 regexPattern = [Case_Name,'_\d{2}\.mat'];
-VarName = 'VM';
+VarName = {'Pos','VM'};
 Tlim = [5,150];
 
 %% Batch extraction of motion related data
@@ -39,11 +39,15 @@ Motion =  Extract_Var_from_Files(regexPattern,VarName);
 
 %% Post process the extracted data
 
-Num_Res = length(Motion);
+Num_Res = length(Motion.(VarName{2}));
 Sinking_Velocity = zeros(Num_Res,1);
+Mean_Velocity = zeros(Num_Res,1);
+Fractal_Dimension = zeros(Num_Res,1);
 
 for n = 1:Num_Res
-    Temp = Motion{n};
+    Res_Num = sprintf('%02d', n);%Output file number
+    disp(['No.',Res_Num,' simulation result being processed ......',newline])
+    Temp = Motion.(VarName{2}){n};
     if n==1
         Times = Temp(:,7);
         MSD = zeros(length(Times),Num_Res);
@@ -52,14 +56,19 @@ for n = 1:Num_Res
     else
         MSD(:,n) = Temp(:,8);
         Sinking_Velocity(n) = Temp(end,6);
+        Mean_Velocity(n) = mean(Temp(:,5));
     end
+    Trajectory = Motion.(VarName{1}){n}(1:3,:).*1e6;
+    Fractal_Dimension(n) = Calculate_Fractal_Dimension(Trajectory');
+    saveas(gcf,[Output_Path,'/',Case_Name,'/',Case_Name,'_',Res_Num,'_FD'],'png')%Save this figure
 end
 
 Mean_MSD = mean(MSD,2);
-RDC = diff(Mean_MSD)/(6*(Times(2)-Tlim(1)));
+RDC = diff(Mean_MSD)/(6*(Times(2)-Times(1)));
 
-
-save([Output_Path,'/',Case_Name,'/',Case_Name,'_SV.mat'],'Sinking_Velocity')
+MPD = struct('Sinking_Velocity',Sinking_Velocity,'Mean_Velocity',Mean_Velocity, ...
+    'Fractal_Dimension',Fractal_Dimension);
+save([Output_Path,'/',Case_Name,'/',Case_Name,'_Motion Post-Data.mat'],'MPD')
 
 %% Draw corresponding result charts
 
@@ -111,4 +120,4 @@ saveas(gcf,[Output_Path,'/',Case_Name,'/',Case_Name,'_Fitted-MSD'],'png')%Save t
 %% Post processing completed, reporting time
 
 Run_Time = toc(Start1);
-fprintf('\n All motion data post-processed in %.2f seconds.\n',Run_Time)
+fprintf('All motion data post-processed in %.2f seconds.\n',Run_Time)
