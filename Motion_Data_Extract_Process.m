@@ -23,6 +23,7 @@ Start1 = tic; %The global timer is on.
 %% Case Naming and Output Path Selection
 
 Case_Name = 'NoPili_A0_dt001_T300';
+% Case_Name = 'Ball_R1_dt001_T300';
 % Output_Path = uigetdir('./','Please select the path to save the results ...'); %For GUI
 Output_Path = './Post-Processing'; %For terminal
 mkdir(Output_Path,Case_Name)
