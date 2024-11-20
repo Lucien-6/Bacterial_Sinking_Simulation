@@ -1,4 +1,4 @@
-function Fractal_Dimension = Calculate_Fractal_Dimension(Trajectory)
+function Fractal_Dimension = Calculate_Fractal_Dimension(Trajectory,Size_Ratio)
 %Fractal_Dimension This function is used to calculate the complexity of the trajectory.
 %   This function use Box-Counting Method to analyze the complexity of
 %   bacterial trajectory, and Trajectory is an N*3 matrix, e.g. [x, y, z].
@@ -8,7 +8,7 @@ function Fractal_Dimension = Calculate_Fractal_Dimension(Trajectory)
 Dis = pdist(Trajectory);
 Min_Dis = min(Dis);
 Max_Dis = max(Dis);
-Factor = Max_Dis/(10*Min_Dis);
+Factor = Max_Dis/(Size_Ratio*Min_Dis);
 
 %Setting the box size sequence
 box_sizes = logspace(log10(1/10),0,20).*(Factor*Min_Dis);
@@ -29,7 +29,7 @@ end
 Fractal_Dimension = -p.p1;
 
 % Display the fractal dimension
-if gof.adjrsquare >= 0.95
+if gof.adjrsquare >= 0.995
     disp(['The estimated fractal dimension of the trajectory is: ', num2str(Fractal_Dimension),newline]);
 else
     warning('Poor linearity of results, please re-select box size range !')
