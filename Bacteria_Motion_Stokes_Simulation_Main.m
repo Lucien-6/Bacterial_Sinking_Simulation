@@ -33,7 +33,7 @@ Start1 = tic; %The global timer is on.
 
 %% Case Naming and Output Path Selection
 
-Case_Name = 'NoPili_A0_dt001_T300_24';
+Case_Name = 'NoPili_A4_dt001_T300_01';
 % Output_Path = uigetdir('./','Please select the path to save the results ...'); %For GUI
 Output_Path = './Results'; %For terminal
 mkdir(Output_Path,Case_Name)
@@ -55,9 +55,9 @@ G = 9.81; %Gravitational acceleration
 Miu = 0.0008007; %Coefficient of dynamic viscosity
 
 %Parameters of bacterial body (Capsule type)
-major_axis = 1.25e-6; %Major axis length
+major_axis = 1.6e-6; %Major axis length
 minor_axis = 0.4e-6; %minor axis length
-Nhead = 2000; %Number of points
+Nhead = 1000; %Number of points
 shift = 1.25; %Force point offset rate
 Density_B = 1180.0; %Bacterial mass density
 Volume_B = pi*minor_axis^2*(4/3*minor_axis+2*(major_axis-minor_axis)); %Bacterial volume
