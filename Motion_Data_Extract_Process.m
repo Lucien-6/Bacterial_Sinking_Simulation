@@ -9,7 +9,7 @@ such as instantaneous velocity, settling velocity, MSD, diffusion coefficient, e
 
 #Modify records:
 1. Added average instantaneous velocity and fractal dimension analysis functions.
-2. Added legend to MSD curve figure.
+2. Added legend to MSD curve figure and saved workspace data.
 
 %}
 
