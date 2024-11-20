@@ -7,7 +7,7 @@ the original program by Prof. Yang Ding of the Beijing Computational Science
 Research Center.
 
 #Creator: Lucien            #Creation time: Oct. 10, 2024
-#Modified by: Lucien       #Last modified time: Nov. 12, 2024
+#Modified by: Lucien       #Last modified time: Nov. 20, 2024
 
 #Modify records:
 ----------------------------- V1.0 --------------------------
@@ -19,6 +19,7 @@ Research Center.
 6. Added random number seed that follows time.
 7. Optimized MSD curve fitting algorithm.
 8. Added progress display during coordinate system conversion.
+9. Optimized the content of the waitbar display.
 
 
 %}
@@ -33,7 +34,7 @@ Start1 = tic; %The global timer is on.
 
 %% Case Naming and Output Path Selection
 
-Case_Name = 'NoPili_A4_dt001_T300_01';
+Case_Name = 'Test';
 % Output_Path = uigetdir('./','Please select the path to save the results ...'); %For GUI
 Output_Path = './Results'; %For terminal
 mkdir(Output_Path,Case_Name)
@@ -193,7 +194,7 @@ PR = cell(1,TNum); %Pili morphology recording cell
 
 Bar = waitbar(0,'1','Name','BMSS_V1.0 Running',...
     'CreateCancelBtn','setappdata(gcbf,''canceling'',1)');
-set(Bar,"Position",[750 500 275 100])
+set(Bar,"Position",[500 500 275 100])
 setappdata(Bar,'canceling',0); %Waitbar setting
 
 hour = nan;
@@ -212,8 +213,8 @@ for i = 1:TNum
         break
     end
     %Update the waitbar
-    str = [' Step ',num2str(i),' / ',num2str(TNum),' is being calculated now ……',newline, ...
-        'Remaining time: ',num2str(hour),' h ',num2str(minute),' m ',num2str(second),' s'];
+    str = ['Case Name: ',Case_Name,newline,' Step ',num2str(i),' / ',num2str(TNum),' is being calculated now ……', ...
+        newline,'Remaining time: ',num2str(hour),' h ',num2str(minute),' m ',num2str(second),' s'];
     waitbar(i/TNum,Bar,str)
 
     %Update the sinking force at step i in Lagrangian coordinates
