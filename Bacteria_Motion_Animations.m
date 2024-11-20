@@ -75,7 +75,8 @@ for n = 1:TNum
     p2 = surf(Z,Y,X,'FaceColor',[35, 139, 42]./255,'EdgeColor','none','FaceAlpha',0.7);
     hold on
     %Draw the centroid of body
-    p3 = plot3(Center(3,n),Center(2,n),Center(1,n),'hexagramr','MarkerSize',5,'MarkerFaceColor','b');
+    p3 = plot3(Center(3,n),Center(2,n),Center(1,n),'hexagramr','MarkerSize',5,'MarkerFaceColor','b',...
+        'MarkerEdgeColor','b');
     hold on
     %Draw trajectory
     p4 = plot3(Center(3,1:n),Center(2,1:n),Center(1,1:n),'-r','MarkerSize',2);
