@@ -10,6 +10,8 @@ such as instantaneous velocity, settling velocity, MSD, diffusion coefficient, e
 #Modify records:
 1. Added average instantaneous velocity and fractal dimension analysis functions.
 2. Added legend to MSD curve figure and saved workspace data.
+3. Two trajectory characterization indicators, namely the maximum offset
+rate and the final offset rate, have been added.
 
 %}
 
@@ -45,6 +47,8 @@ Num_Res = length(Motion.(VarName{2}));
 Sinking_Velocity = zeros(Num_Res,1);
 Mean_Velocity = zeros(Num_Res,1);
 Fractal_Dimension = zeros(Num_Res,1);
+Max_Offset_Ratio = zeros(Num_Res,1);
+Final_Offset_Ratio = zeros(Num_Res,1);
 
 for n = 1:Num_Res
     Res_Num = sprintf('%02d', n);%Output file number
@@ -58,6 +62,8 @@ for n = 1:Num_Res
     Sinking_Velocity(n) = Temp(end,6);
     Mean_Velocity(n) = mean(Temp(:,5));
     Trajectory = Motion.(VarName{1}){n}(1:3,:).*1e6;
+    Max_Offset_Ratio(n) = max(vecnorm(Trajectory(2:3,:)))/abs(Trajectory(1,end));
+    Final_Offset_Ratio(n) = vecnorm(Trajectory(2:3,end))/abs(Trajectory(1,end));
     Fractal_Dimension(n) = Calculate_Fractal_Dimension(Trajectory',10);
     saveas(gcf,[Output_Path,'/',Case_Name,'/',Case_Name,'_',Res_Num,'_FD'],'png')%Save this figure
 end
@@ -116,6 +122,7 @@ saveas(gcf,[Output_Path,'/',Case_Name,'/',Case_Name,'_Fitted-MSD'],'png')%Save t
 %% Post processing completed, reporting time
 
 MPD = struct('Sinking_Velocity',Sinking_Velocity,'Mean_Velocity',Mean_Velocity, ...
+    'Max_Offset_Ratio',Max_Offset_Ratio,'Final_Offset_Ratio',Final_Offset_Ratio, ...
     'Fractal_Dimension',Fractal_Dimension,'Diffusion_Coefficient',fo.p2/6,'FSV',sqrt(fo.p1));
 % MPD = struct('Sinking_Velocity',Sinking_Velocity,'Mean_Velocity',Mean_Velocity, ...
 %     'Fractal_Dimension',Fractal_Dimension,'Diffusion_Coefficient',fo.p1/6);
