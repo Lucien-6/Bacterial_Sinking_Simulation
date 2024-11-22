@@ -5,13 +5,14 @@ the "Bacterial Motion Stokes Simulation" project, ultimately obtaining chart inf
 such as instantaneous velocity, settling velocity, MSD, diffusion coefficient, etc.
 
 #Creator: Lucien            #Creation time: Nov. 15, 2024
-#Modified by: Lucien     #Last modified time: Nov. 20, 2024
+#Modified by: Lucien     #Last modified time: Nov. 22, 2024
 
 #Modify records:
 1. Added average instantaneous velocity and fractal dimension analysis functions.
 2. Added legend to MSD curve figure and saved workspace data.
 3. Two trajectory characterization indicators, namely the maximum offset
 rate and the final offset rate, have been added.
+4. Added verification steps for case parameter settings.
 
 %}
 
@@ -25,7 +26,7 @@ Start1 = tic; %The global timer is on.
 
 %% Case Naming and Output Path Selection
 
-Case_Name = 'NoPili_A2_dt001_T300';
+Case_Name = 'NoPili_A4_dt001_T300';
 % Case_Name = 'Ball_R1_G0_dt001_T300';
 % Output_Path = uigetdir('./','Please select the path to save the results ...'); %For GUI
 Output_Path = './Post-Processing'; %For terminal
@@ -34,8 +35,11 @@ mkdir(Output_Path,Case_Name)
 %% Related parameter settings
 
 regexPattern = [Case_Name,'_\d{2}\.mat'];
-VarName = {'Pos','VM'};
-Tlim = [3,150];
+VarName = {'Pos','VM','major_axis','minor_axis','G'};
+Tlim = [20,150];
+MajA = 1.6e-6;
+MinA = 0.4e-6;
+Gravity = 9.81;
 
 %% Batch extraction of motion related data
 
@@ -53,19 +57,25 @@ Final_Offset_Ratio = zeros(Num_Res,1);
 for n = 1:Num_Res
     Res_Num = sprintf('%02d', n);%Output file number
     disp(['No.',Res_Num,' simulation result being processed ......',newline])
-    Temp = Motion.(VarName{2}){n};
-    if n==1
-        Times = Temp(:,7);
-        MSD = zeros(length(Times),Num_Res);
+    %Parametric test
+    if Motion.(VarName{3}){n} == MajA && Motion.(VarName{4}){n} == MinA && ...
+            Motion.(VarName{5}){n} == Gravity
+        Temp = Motion.(VarName{2}){n};
+        if n==1
+            Times = Temp(:,7);
+            MSD = zeros(length(Times),Num_Res);
+        end
+        MSD(:,n) = Temp(:,8);
+        Sinking_Velocity(n) = Temp(end,6);
+        Mean_Velocity(n) = mean(Temp(:,5));
+        Trajectory = Motion.(VarName{1}){n}(1:3,:).*1e6;
+        Max_Offset_Ratio(n) = max(vecnorm(Trajectory(2:3,:)))/abs(Trajectory(1,end));
+        Final_Offset_Ratio(n) = vecnorm(Trajectory(2:3,end))/abs(Trajectory(1,end));
+        Fractal_Dimension(n) = Calculate_Fractal_Dimension(Trajectory',15);
+        saveas(gcf,[Output_Path,'/',Case_Name,'/',Case_Name,'_',Res_Num,'_FD'],'png')%Save this figure
+    else
+        error('The parameter settings for this case are incorrect !')
     end
-    MSD(:,n) = Temp(:,8);
-    Sinking_Velocity(n) = Temp(end,6);
-    Mean_Velocity(n) = mean(Temp(:,5));
-    Trajectory = Motion.(VarName{1}){n}(1:3,:).*1e6;
-    Max_Offset_Ratio(n) = max(vecnorm(Trajectory(2:3,:)))/abs(Trajectory(1,end));
-    Final_Offset_Ratio(n) = vecnorm(Trajectory(2:3,end))/abs(Trajectory(1,end));
-    Fractal_Dimension(n) = Calculate_Fractal_Dimension(Trajectory',10);
-    saveas(gcf,[Output_Path,'/',Case_Name,'/',Case_Name,'_',Res_Num,'_FD'],'png')%Save this figure
 end
 
 Mean_MSD = mean(MSD,2);
