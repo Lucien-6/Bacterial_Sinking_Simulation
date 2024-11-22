@@ -56,9 +56,9 @@ G = 9.81; %Gravitational acceleration
 Miu = 0.0008007; %Coefficient of dynamic viscosity
 
 %Parameters of bacterial body (Capsule type)
-major_axis = 1.6e-6; %Major axis length
+major_axis = 2.0e-6; %Major axis length
 minor_axis = 0.4e-6; %minor axis length
-Nhead = 1000; %Number of points
+Nhead = 1200; %Number of points
 shift = 1.25; %Force point offset rate
 Density_B = 1180.0; %Bacterial mass density
 Volume_B = pi*minor_axis^2*(4/3*minor_axis+2*(major_axis-minor_axis)); %Bacterial volume
@@ -214,8 +214,9 @@ for i = 1:TNum
     end
     %Update the waitbar
     str = ['Case Name: ',Case_Name,newline,' Step ',num2str(i),' / ',num2str(TNum),' is being calculated now ……', ...
-        newline,'Remaining time: ',num2str(hour),' h ',num2str(minute),' m ',num2str(second),' s'];
-    waitbar(i/TNum,Bar,str)
+        newline,'ETA: ',num2str(hour),' h ',num2str(minute),' m ',num2str(second),' s'];
+    newStr = strrep(str, '_', '-');
+    waitbar(i/TNum,Bar,newStr)
 
     %Update the sinking force at step i in Lagrangian coordinates
     [Trans{i},US] = Sink_Force_Update(i,Sink_Theta,TStep,Velocity_Log,Force_Direct);
@@ -300,7 +301,7 @@ disp([newline,'Bacterial sinking velocity and MSD is calculated !'])
 %% Completion of the program and statistical reporting
 
 Time = toc(Start1);
-clearvars Force_Direct hour minute bHead pili second U US UU B BB C M Mall P R %Clear intermediate variables to save space
+clearvars Force_Direct hour minute bHead pili second U US UU B BB C M Mall P R Bar newStr str%Clear intermediate variables to save space
 save([Output_Path,'/',Case_Name,'/',Case_Name,'.mat']); %Save all data in the workspace
 % fprintf('\n@Total time steps：%d ，Convergence steps：%d 、Failed steps：%d !\n',TNum,CountS,CountF);
 fprintf('\n@Total running time：%6.2f hours\n\n',Time/3600);
