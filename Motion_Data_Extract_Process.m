@@ -5,7 +5,7 @@ the "Bacterial Motion Stokes Simulation" project, ultimately obtaining chart inf
 such as instantaneous velocity, settling velocity, MSD, diffusion coefficient, etc.
 
 #Creator: Lucien            #Creation time: Nov. 15, 2024
-#Modified by: Lucien     #Last modified time: Nov. 22, 2024
+#Modified by: Lucien     #Last modified time: Nov. 25, 2024
 
 #Modify records:
 1. Added average instantaneous velocity and fractal dimension analysis functions.
@@ -13,6 +13,7 @@ such as instantaneous velocity, settling velocity, MSD, diffusion coefficient, e
 3. Two trajectory characterization indicators, namely the maximum offset
 rate and the final offset rate, have been added.
 4. Added verification steps for case parameter settings.
+5. Added trajectory example drawing and output function.
 
 %}
 
@@ -53,6 +54,7 @@ Mean_Velocity = zeros(Num_Res,1);
 Fractal_Dimension = zeros(Num_Res,1);
 Max_Offset_Ratio = zeros(Num_Res,1);
 Final_Offset_Ratio = zeros(Num_Res,1);
+Trajectories = cell(Num_Res,1);
 
 for n = 1:Num_Res
     Res_Num = sprintf('%02d', n);%Output file number
@@ -69,6 +71,7 @@ for n = 1:Num_Res
         Sinking_Velocity(n) = Temp(end,6);
         Mean_Velocity(n) = mean(Temp(:,5));
         Trajectory = Motion.(VarName{1}){n}(1:3,:).*1e6;
+        Trajectories{n} = Trajectory;
         Max_Offset_Ratio(n) = max(vecnorm(Trajectory(2:3,:)))/abs(Trajectory(1,end));
         Final_Offset_Ratio(n) = vecnorm(Trajectory(2:3,end))/abs(Trajectory(1,end));
         Fractal_Dimension(n) = Calculate_Fractal_Dimension(Trajectory',15);
@@ -82,6 +85,27 @@ Mean_MSD = mean(MSD,2);
 RDC = diff(Mean_MSD)/(6*(Times(2)-Times(1)));
 
 %% Draw corresponding result charts
+
+Simple = 5;
+Clist = slanCL(821);
+Tags = randi([1 Num_Res],Simple,1);
+
+figure('Name','Trajectories')
+set(gcf,'Position',[20 20 750 1000])
+for m = 1:Simple
+    Trajectory = Trajectories{m};
+    plot3(Trajectory(3,:),Trajectory(2,:),Trajectory(1,:),'LineWidth',2.0,'Color',Clist(m,:))
+    hold on
+end
+set(gca,'ZDir','reverse','FontName','Times New Roman')
+grid on
+axis equal
+ax = gca; ax.LineWidth = 1.5;
+ax.FontSize = 12;
+title('Trajectories examples','FontSize',24,'FontWeight','bold')
+xlabel('Z / μm','FontSize',18);ylabel('Y / μm','FontSize',18);zlabel('X / μm','FontSize',18)
+hold off
+saveas(gcf,[Output_Path,'/',Case_Name,'/',Case_Name,'_Trajectories'],'png')%Save this figure
 
 figure('Name','MSD Curves')
 set(gcf,'Position',[20 20 1200 1000])
