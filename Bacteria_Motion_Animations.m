@@ -7,7 +7,7 @@ function Bacteria_Motion_Animations(Case_Name,TStep,major_axis,TNum,bac,PR,Trans
 
 avi_object = VideoWriter([Output_Path,'/',Case_Name,'/',Case_Name,'_Bac_Movie.mp4']);
 avi_object.FrameRate = 1/TStep;
-avi_object.Quality = 90;
+avi_object.Quality = 50;
 open(avi_object);
 avi_figure = figure;
 set(gcf,'position',[10,10,750,1500]);
