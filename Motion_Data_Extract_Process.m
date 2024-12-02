@@ -5,7 +5,7 @@ the "Bacterial Motion Stokes Simulation" project, ultimately obtaining chart inf
 such as instantaneous velocity, settling velocity, MSD, diffusion coefficient, etc.
 
 #Creator: Lucien            #Creation time: Nov. 15, 2024
-#Modified by: Lucien     #Last modified time: Nov. 25, 2024
+#Modified by: Lucien     #Last modified time: Dec. 2, 2024
 
 #Modify records:
 1. Added average instantaneous velocity and fractal dimension analysis functions.
@@ -14,6 +14,8 @@ such as instantaneous velocity, settling velocity, MSD, diffusion coefficient, e
 rate and the final offset rate, have been added.
 4. Added verification steps for case parameter settings.
 5. Added trajectory example drawing and output function.
+6. Added the function to calculate and plot the offset ratio-time curve;
+7. Added the function of plotting the distribution of final landing points.
 
 %}
 
@@ -27,7 +29,7 @@ Start1 = tic; %The global timer is on.
 
 %% Case Naming and Output Path Selection
 
-Case_Name = 'NoPili_A4_dt001_T300';
+Case_Name = 'NoPili_A5_dt001_T300';
 % Case_Name = 'Ball_R1_G0_dt001_T300';
 % Output_Path = uigetdir('./','Please select the path to save the results ...'); %For GUI
 Output_Path = './Post-Processing'; %For terminal
@@ -35,10 +37,10 @@ mkdir(Output_Path,Case_Name)
 
 %% Related parameter settings
 
-regexPattern = [Case_Name,'_\d{2}\.mat'];
+regexPattern = [Case_Name,'_\d+\.mat'];
 VarName = {'Pos','VM','major_axis','minor_axis','G'};
-Tlim = [20,150];
-MajA = 1.6e-6;
+Tlim = [40,150];
+MajA = 2.0e-6;
 MinA = 0.4e-6;
 Gravity = 9.81;
 
@@ -55,6 +57,7 @@ Fractal_Dimension = zeros(Num_Res,1);
 Max_Offset_Ratio = zeros(Num_Res,1);
 Final_Offset_Ratio = zeros(Num_Res,1);
 Trajectories = cell(Num_Res,1);
+Final_YZ = zeros(Num_Res,2);
 
 for n = 1:Num_Res
     Res_Num = sprintf('%02d', n);%Output file number
@@ -66,11 +69,16 @@ for n = 1:Num_Res
         if n==1
             Times = Temp(:,7);
             MSD = zeros(length(Times),Num_Res);
+            OR = zeros(length(Times),2);
         end
         MSD(:,n) = Temp(:,8);
         Sinking_Velocity(n) = Temp(end,6);
         Mean_Velocity(n) = mean(Temp(:,5));
         Trajectory = Motion.(VarName{1}){n}(1:3,:).*1e6;
+        Final_YZ(n,:) = Trajectory(2:3,end);
+        Pos(:,1) = [0;Times];
+        Pos(:,2:4) = Trajectory';
+        OR = OR+Offset_Ratio(Pos);
         Trajectories{n} = Trajectory;
         Max_Offset_Ratio(n) = max(vecnorm(Trajectory(2:3,:)))/abs(Trajectory(1,end));
         Final_Offset_Ratio(n) = vecnorm(Trajectory(2:3,end))/abs(Trajectory(1,end));
@@ -79,10 +87,12 @@ for n = 1:Num_Res
     else
         error('The parameter settings for this case are incorrect !')
     end
+    close all
 end
 
 Mean_MSD = mean(MSD,2);
 RDC = diff(Mean_MSD)/(6*(Times(2)-Times(1)));
+MOR = OR./Num_Res;
 
 %% Draw corresponding result charts
 
@@ -94,7 +104,7 @@ figure('Name','Trajectories')
 set(gcf,'Position',[20 20 750 1000])
 for m = 1:Simple
     Trajectory = Trajectories{m};
-    plot3(Trajectory(3,:),Trajectory(2,:),Trajectory(1,:),'LineWidth',2.0,'Color',Clist(m,:))
+    plot3(Trajectory(3,:),Trajectory(2,:),Trajectory(1,:),'LineWidth',1.5,'Color',Clist(m,:))
     hold on
 end
 set(gca,'ZDir','reverse','FontName','Times New Roman')
@@ -153,11 +163,44 @@ latexf = ['$${\bf y}=6*',num2str(fo.p2/6),'*\Delta{\bf t}+',num2str(sqrt(fo.p1))
 text(Tlim(2),fo(Tlim(2)),latexf,'Interpreter','latex','FontSize',14,'Color','k','HorizontalAlignment','right')
 saveas(gcf,[Output_Path,'/',Case_Name,'/',Case_Name,'_Fitted-MSD'],'png')%Save this figure
 
+figure('Name','Offset Ratio Curve')
+set(gcf,'Position',[20 20 1200 1000])
+plot(MOR(:,1),MOR(:,2),'r','LineWidth',2.0)
+set(gca,'FontName','Times New Roman')
+grid on
+ax = gca; ax.LineWidth = 1.5;
+ax.FontSize = 12;
+title('Offset Ratio Curve','FontSize',24,'FontWeight','bold')
+xlabel('Δt (s)','FontSize',18);ylabel('Offset Ratio','FontSize',18);
+saveas(gcf,[Output_Path,'/',Case_Name,'/',Case_Name,'_MOR'],'png')%Save this figure
+
+figure('Name','Final landing points')
+set(gcf,'Position',[20 20 1000 1000])
+L2 = scatter(Final_YZ(:,1),Final_YZ(:,2),40,'MarkerEdgeColor',[0 .5 .5],...
+              'MarkerFaceColor',[0 .7 .7],'LineWidth',1.5);
+hold on
+L = axis;
+plot([L(1), L(2)], [0, 0], 'k--','LineWidth',2.0);
+hold on
+plot([0, 0], [L(3), L(4)], 'k--','LineWidth',2.0);
+hold on
+L4 = plot(sum(Final_YZ(:,1))/50,sum(Final_YZ(:,2))/50,'rp','MarkerSize',15,'MarkerFaceColor','r');
+set(gca,'FontName','Times New Roman')
+axis equal
+grid on
+ax = gca; ax.LineWidth = 1.5;
+ax.FontSize = 12;
+title('Final Landing Points','FontSize',24,'FontWeight','bold')
+xlabel('Y (μm)','FontSize',18);ylabel('Z (μm)','FontSize',18);
+legend([L2,L4],{'Final landig points','Mean landing point'},'FontSize',16,'Location','northeast')
+saveas(gcf,[Output_Path,'/',Case_Name,'/',Case_Name,'_FLP'],'png')%Save this figure
+
 %% Post processing completed, reporting time
 
 MPD = struct('Sinking_Velocity',Sinking_Velocity,'Mean_Velocity',Mean_Velocity, ...
     'Max_Offset_Ratio',Max_Offset_Ratio,'Final_Offset_Ratio',Final_Offset_Ratio, ...
-    'Fractal_Dimension',Fractal_Dimension,'Diffusion_Coefficient',fo.p2/6,'FSV',sqrt(fo.p1));
+    'Fractal_Dimension',Fractal_Dimension,'Offset_Ratio',MOR,'Diffusion_Coefficient', ...
+    fo.p2/6,'FSV',sqrt(fo.p1));
 % MPD = struct('Sinking_Velocity',Sinking_Velocity,'Mean_Velocity',Mean_Velocity, ...
 %     'Fractal_Dimension',Fractal_Dimension,'Diffusion_Coefficient',fo.p1/6);
 save([Output_Path,'/',Case_Name,'/',Case_Name,'_Motion Post-Data.mat'],'MPD')
