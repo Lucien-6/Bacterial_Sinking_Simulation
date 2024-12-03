@@ -15,8 +15,8 @@ Temp = zeros(Num-1,Num-1);
 
 for m = 1:Num-1
     YZ = vecnorm((Trajectory(m+1:end,3:4)-Trajectory(m,3:4)),2,2);
-    X = abs(Trajectory(m+1:end,2)-Trajectory(m,2));
-    Temp(1:end+1-m,m) = YZ./X; 
+    X = Trajectory(m+1:end,2)-Trajectory(m,2);
+    Temp(1:end+1-m,m) = atan(YZ./X); 
 end
 
 Temp(Temp==0) = NaN;

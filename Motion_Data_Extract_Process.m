@@ -17,6 +17,7 @@ rate and the final offset rate, have been added.
 6. Added the function to calculate and plot the offset ratio-time curve.
 7. Added the function of plotting the distribution of final landing points.
 8. Smoothing optimized for mean offset ratio data.
+9. Replace the offset ratio with a better offset angle.
 
 %}
 
@@ -73,7 +74,7 @@ for n = 1:Num_Res
         if n==1
             Times = Temp(:,7);
             MSD = zeros(length(Times),Num_Res);
-            OR = zeros(length(Times),2);
+            OA = zeros(length(Times),2);
         end
         MSD(:,n) = Temp(:,8);
         Sinking_Velocity(n) = Temp(end,6);
@@ -82,12 +83,12 @@ for n = 1:Num_Res
         Final_YZ(n,:) = Trajectory(2:3,end);%Final landing point
         Pos(:,1) = [0;Times];
         Pos(:,2:4) = Trajectory';
-        OR = OR+Offset_Ratio(Pos);%Offset ratio
+        OA = OA+Offset_Ratio(Pos);%Offset ratio
         Trajectories{n} = Trajectory;
         Max_Offset_Ratio(n) = max(vecnorm(Trajectory(2:3,:)))/abs(Trajectory(1,end));
         Final_Offset_Ratio(n) = vecnorm(Trajectory(2:3,end))/abs(Trajectory(1,end));
-        Fractal_Dimension(n) = Calculate_Fractal_Dimension(Trajectory',15);
-        saveas(gcf,[Output_Path,'/',Case_Name,'/',Case_Name,'_',Res_Num,'_FD'],'png')%Save this figure
+        % Fractal_Dimension(n) = Calculate_Fractal_Dimension(Trajectory',15);
+        % saveas(gcf,[Output_Path,'/',Case_Name,'/',Case_Name,'_',Res_Num,'_FD'],'png')%Save this figure
     else
         error('The parameter settings for this case are incorrect !')
     end
@@ -96,10 +97,7 @@ end
 
 Mean_MSD = mean(MSD,2);
 RDC = diff(Mean_MSD)/(6*(Times(2)-Times(1)));%Running diffusion curve
-Temp2 = OR./Num_Res;%Mean offset ratio
-TF = isoutlier(Temp2(:,2),'movmedian',10);
-MOR = Temp2(~TF,:);
-MOR(:,2) = smooth(MOR(:,2),300,'sgolay',2); 
+MOA = OA./Num_Res;%Mean offset ratio
 
 %% Draw corresponding result charts
 
@@ -170,16 +168,16 @@ latexf = ['$${\bf y}=6*',num2str(fo.p2/6),'*\Delta{\bf t}+',num2str(sqrt(fo.p1))
 text(Tlim(2),fo(Tlim(2)),latexf,'Interpreter','latex','FontSize',14,'Color','k','HorizontalAlignment','right')
 saveas(gcf,[Output_Path,'/',Case_Name,'/',Case_Name,'_Fitted-MSD'],'png')%Save this figure
 
-figure('Name','Offset Ratio Curve')
+figure('Name','Offset Angle Curve')
 set(gcf,'Position',[20 20 1200 1000])
-plot(MOR(:,1),MOR(:,2),'r','LineWidth',2.0)
+plot(MOA(:,1),MOA(:,2),'r','LineWidth',2.0)
 set(gca,'FontName','Times New Roman')
 grid on
 ax = gca; ax.LineWidth = 1.5;
 ax.FontSize = 12;
 title('Offset Ratio Curve','FontSize',24,'FontWeight','bold')
-xlabel('Δt (s)','FontSize',18);ylabel('Offset Ratio','FontSize',18);
-saveas(gcf,[Output_Path,'/',Case_Name,'/',Case_Name,'_MOR'],'png')%Save this figure
+xlabel('Δt (s)','FontSize',18);ylabel('Offset Angle (rad)','FontSize',18);
+saveas(gcf,[Output_Path,'/',Case_Name,'/',Case_Name,'_MOA'],'png')%Save this figure
 
 figure('Name','Final landing points')
 set(gcf,'Position',[20 20 1000 1000])
@@ -206,7 +204,7 @@ saveas(gcf,[Output_Path,'/',Case_Name,'/',Case_Name,'_FLP'],'png')%Save this fig
 
 MPD = struct('Sinking_Velocity',Sinking_Velocity,'Mean_Velocity',Mean_Velocity, ...
     'Max_Offset_Ratio',Max_Offset_Ratio,'Final_Offset_Ratio',Final_Offset_Ratio, ...
-    'Fractal_Dimension',Fractal_Dimension,'Offset_Ratio',MOR,'Diffusion_Coefficient', ...
+    'Fractal_Dimension',Fractal_Dimension,'Offset_Ratio',MOA,'Diffusion_Coefficient', ...
     fo.p2/6,'FSV',sqrt(fo.p1));
 % MPD = struct('Sinking_Velocity',Sinking_Velocity,'Mean_Velocity',Mean_Velocity, ...
 %     'Fractal_Dimension',Fractal_Dimension,'Diffusion_Coefficient',fo.p1/6);
