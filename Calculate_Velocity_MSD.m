@@ -72,7 +72,7 @@ hold on
 L2 = line([0.002*VM(end,1) 0.1*VM(end,1)],...
     [0.002*VM(end,1) 0.1*VM(end,1)],...
     'Color','k','LineWidth',1.5,'LineStyle','--');
-legend([L1,L2],{'Simulation Data','log(Y) = log(X)'},'FontSize',16,'Location','southeast')
+legend([L1,L2],{'Simulation Data','Power Law = 1'},'FontSize',16,'Location','southeast')
 
 saveas(gcf,[Output_Path,'/',Case_Name,'/',Case_Name,'_MSD'],'png')%Save this figure
 
