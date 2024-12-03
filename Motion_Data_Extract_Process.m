@@ -5,7 +5,7 @@ the "Bacterial Motion Stokes Simulation" project, ultimately obtaining chart inf
 such as instantaneous velocity, settling velocity, MSD, diffusion coefficient, etc.
 
 #Creator: Lucien            #Creation time: Nov. 15, 2024
-#Modified by: Lucien     #Last modified time: Dec. 2, 2024
+#Modified by: Lucien     #Last modified time: Dec. 3, 2024
 
 #Modify records:
 1. Added average instantaneous velocity and fractal dimension analysis functions.
@@ -14,8 +14,9 @@ such as instantaneous velocity, settling velocity, MSD, diffusion coefficient, e
 rate and the final offset rate, have been added.
 4. Added verification steps for case parameter settings.
 5. Added trajectory example drawing and output function.
-6. Added the function to calculate and plot the offset ratio-time curve;
+6. Added the function to calculate and plot the offset ratio-time curve.
 7. Added the function of plotting the distribution of final landing points.
+8. Smoothing optimized for mean offset ratio data.
 
 %}
 
@@ -38,11 +39,14 @@ mkdir(Output_Path,Case_Name)
 %% Related parameter settings
 
 regexPattern = [Case_Name,'_\d+\.mat'];
-VarName = {'Pos','VM','major_axis','minor_axis','G'};
+VarName = {'Pos','VM','major_axis','minor_axis','G','Pili_Matrix'};
 Tlim = [40,150];
+
+%Checking parameters
 MajA = 2.0e-6;
 MinA = 0.4e-6;
 Gravity = 9.81;
+PM = [1;0;0;0;NaN;NaN;NaN;1];
 
 %% Batch extraction of motion related data
 
@@ -64,7 +68,7 @@ for n = 1:Num_Res
     disp(['No.',Res_Num,' simulation result being processed ......',newline])
     %Parametric test
     if Motion.(VarName{3}){n} == MajA && Motion.(VarName{4}){n} == MinA && ...
-            Motion.(VarName{5}){n} == Gravity
+            Motion.(VarName{5}){n} == Gravity && isequaln(Motion.(VarName{6}){n},PM)
         Temp = Motion.(VarName{2}){n};
         if n==1
             Times = Temp(:,7);
@@ -75,10 +79,10 @@ for n = 1:Num_Res
         Sinking_Velocity(n) = Temp(end,6);
         Mean_Velocity(n) = mean(Temp(:,5));
         Trajectory = Motion.(VarName{1}){n}(1:3,:).*1e6;
-        Final_YZ(n,:) = Trajectory(2:3,end);
+        Final_YZ(n,:) = Trajectory(2:3,end);%Final landing point
         Pos(:,1) = [0;Times];
         Pos(:,2:4) = Trajectory';
-        OR = OR+Offset_Ratio(Pos);
+        OR = OR+Offset_Ratio(Pos);%Offset ratio
         Trajectories{n} = Trajectory;
         Max_Offset_Ratio(n) = max(vecnorm(Trajectory(2:3,:)))/abs(Trajectory(1,end));
         Final_Offset_Ratio(n) = vecnorm(Trajectory(2:3,end))/abs(Trajectory(1,end));
@@ -91,8 +95,11 @@ for n = 1:Num_Res
 end
 
 Mean_MSD = mean(MSD,2);
-RDC = diff(Mean_MSD)/(6*(Times(2)-Times(1)));
-MOR = OR./Num_Res;
+RDC = diff(Mean_MSD)/(6*(Times(2)-Times(1)));%Running diffusion curve
+Temp2 = OR./Num_Res;%Mean offset ratio
+TF = isoutlier(Temp2(:,2),'movmedian',10);
+MOR = Temp2(~TF,:);
+MOR(:,2) = smooth(MOR(:,2),300,'sgolay',2); 
 
 %% Draw corresponding result charts
 
