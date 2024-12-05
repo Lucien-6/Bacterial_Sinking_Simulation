@@ -7,7 +7,7 @@ the original program by Prof. Yang Ding of the Beijing Computational Science
 Research Center.
 
 #Creator: Lucien            #Creation time: Oct. 10, 2024
-#Modified by: Lucien       #Last modified time: Nov. 20, 2024
+#Modified by: Lucien       #Last modified time: Dec. 5, 2024
 
 #Modify records:
 ----------------------------- V1.0 --------------------------
@@ -20,6 +20,7 @@ Research Center.
 7. Optimized MSD curve fitting algorithm.
 8. Added progress display during coordinate system conversion.
 9. Optimized the content of the waitbar display.
+10. Improved calculation of relaxation time.
 
 
 %}
@@ -56,9 +57,9 @@ G = 9.81; %Gravitational acceleration
 Miu = 0.0008007; %Coefficient of dynamic viscosity
 
 %Parameters of bacterial body (Capsule type)
-major_axis = 2.0e-6; %Major axis length
+major_axis = 0.4e-6; %Major axis length
 minor_axis = 0.4e-6; %minor axis length
-Nhead = 1200; %Number of points
+Nhead = 1000; %Number of points
 shift = 1.25; %Force point offset rate
 Density_B = 1180.0; %Bacterial mass density
 Volume_B = pi*minor_axis^2*(4/3*minor_axis+2*(major_axis-minor_axis)); %Bacterial volume
@@ -172,7 +173,7 @@ Rand = randn(TNum,6);
 
 Rand = Rand-mean(Rand); %Set the mean to 0 through translation
 
-Brown = sqrt(2*KB*Temper*diag(DFM)./TStep);
+Brown = sqrt(2*KB*Temper*diag(DFM)./TStep)*0;
 
 disp([newline,'Brownian motion stochastic force constructed !'])
 
@@ -287,7 +288,7 @@ disp([newline,'Bacterial trajectory is calculated !'])
 
 disp([newline,'Calculate bacterial sinking velocity and MSD ……'])
 Tlim = zeros(2,1);
-Tlim(1) = ceil((8*pi*Miu*major_axis^3)/(KB*Temper)) ;
+Tlim(1) = max(diag(DFM(4:6,4:6))/(KB*Temper)); %Relaxation time
 Tlim(2) = TEnd/2;
 VM = Calculate_Velocity_MSD(Pos,TStep,Case_Name,Tlim,Output_Path);
 disp([newline,'Bacterial sinking velocity and MSD is calculated !'])
