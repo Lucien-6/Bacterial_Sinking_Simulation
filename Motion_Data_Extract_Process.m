@@ -87,8 +87,8 @@ for n = 1:Num_Res
         Trajectories{n} = Trajectory;
         Max_Offset_Ratio(n) = max(vecnorm(Trajectory(2:3,:)))/abs(Trajectory(1,end));
         Final_Offset_Ratio(n) = vecnorm(Trajectory(2:3,end))/abs(Trajectory(1,end));
-        % Fractal_Dimension(n) = Calculate_Fractal_Dimension(Trajectory',15);
-        % saveas(gcf,[Output_Path,'/',Case_Name,'/',Case_Name,'_',Res_Num,'_FD'],'png')%Save this figure
+        Fractal_Dimension(n) = Calculate_Fractal_Dimension(Trajectory',15);
+        saveas(gcf,[Output_Path,'/',Case_Name,'/',Case_Name,'_',Res_Num,'_FD'],'png')%Save this figure
     else
         error('The parameter settings for this case are incorrect !')
     end
@@ -204,7 +204,7 @@ saveas(gcf,[Output_Path,'/',Case_Name,'/',Case_Name,'_FLP'],'png')%Save this fig
 
 MPD = struct('Sinking_Velocity',Sinking_Velocity,'Mean_Velocity',Mean_Velocity, ...
     'Max_Offset_Ratio',Max_Offset_Ratio,'Final_Offset_Ratio',Final_Offset_Ratio, ...
-    'Fractal_Dimension',Fractal_Dimension,'Offset_Ratio',MOA,'Diffusion_Coefficient', ...
+    'Fractal_Dimension',Fractal_Dimension,'Offset_Angle',MOA,'Diffusion_Coefficient', ...
     fo.p2/6,'FSV',sqrt(fo.p1));
 % MPD = struct('Sinking_Velocity',Sinking_Velocity,'Mean_Velocity',Mean_Velocity, ...
 %     'Fractal_Dimension',Fractal_Dimension,'Diffusion_Coefficient',fo.p1/6);

@@ -8,7 +8,7 @@ close all force
 clear
 clc
 
-for no = 1:20
+for no = 27:36
 
     close all force
     clearvars -except no
