@@ -288,7 +288,7 @@ disp([newline,'Bacterial trajectory is calculated !'])
 
 disp([newline,'Calculate bacterial sinking velocity and MSD ……'])
 Tlim = zeros(2,1);
-Tlim(1) = max(diag(DFM(4:6,4:6))/(KB*Temper)); %Relaxation time
+Tlim(1) = ceil(max(diag(DFM(4:6,4:6))./(KB*Temper))); %Relaxation time
 Tlim(2) = TEnd/2;
 VM = Calculate_Velocity_MSD(Pos,TStep,Case_Name,Tlim,Output_Path);
 disp([newline,'Bacterial sinking velocity and MSD is calculated !'])
