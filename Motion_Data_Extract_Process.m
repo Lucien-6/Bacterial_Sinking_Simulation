@@ -31,8 +31,8 @@ Start1 = tic; %The global timer is on.
 
 %% Case Naming and Output Path Selection
 
-Case_Name = 'NoPili_A5_dt001_T300';
-% Case_Name = 'Ball_R1_G0_dt001_T300';
+% Case_Name = 'NoPili_A5_dt001_T300';
+Case_Name = 'Ball_R1_G0_dt001_T300';
 % Output_Path = uigetdir('./','Please select the path to save the results ...'); %For GUI
 Output_Path = './Post-Processing'; %For terminal
 mkdir(Output_Path,Case_Name)
@@ -41,12 +41,12 @@ mkdir(Output_Path,Case_Name)
 
 regexPattern = [Case_Name,'_\d+\.mat'];
 VarName = {'Pos','VM','major_axis','minor_axis','G','Pili_Matrix'};
-Tlim = [40,150];
+Tlim = [5,150];
 
 %Checking parameters
-MajA = 2.0e-6;
-MinA = 0.4e-6;
-Gravity = 9.81;
+MajA = 1.0e-6;
+MinA = 1.0e-6;
+Gravity = 9.81*0;
 PM = [1;0;0;0;NaN;NaN;NaN;1];
 
 %% Batch extraction of motion related data
@@ -87,8 +87,8 @@ for n = 1:Num_Res
         Trajectories{n} = Trajectory;
         Max_Offset_Ratio(n) = max(vecnorm(Trajectory(2:3,:)))/abs(Trajectory(1,end));
         Final_Offset_Ratio(n) = vecnorm(Trajectory(2:3,end))/abs(Trajectory(1,end));
-        % Fractal_Dimension(n) = Calculate_Fractal_Dimension(Trajectory',15);
-        % saveas(gcf,[Output_Path,'/',Case_Name,'/',Case_Name,'_',Res_Num,'_FD'],'png')%Save this figure
+        Fractal_Dimension(n) = Calculate_Fractal_Dimension(Trajectory',10);
+        saveas(gcf,[Output_Path,'/',Case_Name,'/',Case_Name,'_',Res_Num,'_FD'],'png')%Save this figure
     else
         error('The parameter settings for this case are incorrect !')
     end
@@ -150,8 +150,8 @@ saveas(gcf,[Output_Path,'/',Case_Name,'/',Case_Name,'_RDC'],'png')%Save this fig
 figure('Name','Fitting MSD')
 set(gcf,'Position',[20 20 1200 1000])
 ExlcudeData = Times<Tlim(1) | Times>Tlim(2);
-[fo,gof] = fit(Times,Mean_MSD,'poly2','Lower',[0 0 0],'Upper',[Inf Inf 0],'Exclude',ExlcudeData);
-% [fo,gof] = fit(Times,Mean_MSD,'poly1','Lower',[0 0],'Upper',[Inf 0],'Exclude',ExlcudeData);
+% [fo,gof] = fit(Times,Mean_MSD,'poly2','Lower',[0 0 0],'Upper',[Inf Inf 0],'Exclude',ExlcudeData);
+[fo,gof] = fit(Times,Mean_MSD,'poly1','Lower',[0 0],'Upper',[Inf 0],'Exclude',ExlcudeData);
 L3 = plot(fo,'--r',Times,Mean_MSD,'-b',ExlcudeData,'.b');
 set(gca,'FontName','Times New Roman')
 L3(1).LineWidth = 3.0;
@@ -162,9 +162,9 @@ ax.FontSize = 12;
 title('Fitted curve of MSD','FontSize',24,'FontWeight','bold')
 xlabel('Δt (s)','FontSize',18);ylabel('MSD (μm^2)','FontSize',18);
 legend({'Simulation Data','Exlcude Data','Fitted Curve'},'FontSize',16,'Location','southeast')
-latexf = ['$${\bf y}=6*',num2str(fo.p2/6),'*\Delta{\bf t}+',num2str(sqrt(fo.p1)),'^2*\Delta{\bf t}^2, ' ...
-    'R^2=',num2str(gof.adjrsquare),' \rightarrow $$'];
-% latexf = ['$${\bf y}=6*',num2str(fo.p1/6),'*\Delta{\bf t}, R^2=',num2str(gof.adjrsquare),' \rightarrow $$'];
+% latexf = ['$${\bf y}=6*',num2str(fo.p2/6),'*\Delta{\bf t}+',num2str(sqrt(fo.p1)),'^2*\Delta{\bf t}^2, ' ...
+%     'R^2=',num2str(gof.adjrsquare),' \rightarrow $$'];
+latexf = ['$${\bf y}=6*',num2str(fo.p1/6),'*\Delta{\bf t}, R^2=',num2str(gof.adjrsquare),' \rightarrow $$'];
 text(Tlim(2),fo(Tlim(2)),latexf,'Interpreter','latex','FontSize',14,'Color','k','HorizontalAlignment','right')
 saveas(gcf,[Output_Path,'/',Case_Name,'/',Case_Name,'_Fitted-MSD'],'png')%Save this figure
 
@@ -202,12 +202,12 @@ saveas(gcf,[Output_Path,'/',Case_Name,'/',Case_Name,'_FLP'],'png')%Save this fig
 
 %% Post processing completed, reporting time
 
-MPD = struct('Sinking_Velocity',Sinking_Velocity,'Mean_Velocity',Mean_Velocity, ...
-    'Max_Offset_Ratio',Max_Offset_Ratio,'Final_Offset_Ratio',Final_Offset_Ratio, ...
-    'Fractal_Dimension',Fractal_Dimension,'Offset_Ratio',MOA,'Diffusion_Coefficient', ...
-    fo.p2/6,'FSV',sqrt(fo.p1));
 % MPD = struct('Sinking_Velocity',Sinking_Velocity,'Mean_Velocity',Mean_Velocity, ...
-%     'Fractal_Dimension',Fractal_Dimension,'Diffusion_Coefficient',fo.p1/6);
+%     'Max_Offset_Ratio',Max_Offset_Ratio,'Final_Offset_Ratio',Final_Offset_Ratio, ...
+%     'Fractal_Dimension',Fractal_Dimension,'Offset_Ratio',MOA,'Diffusion_Coefficient', ...
+%     fo.p2/6,'FSV',sqrt(fo.p1));
+MPD = struct('Sinking_Velocity',Sinking_Velocity,'Mean_Velocity',Mean_Velocity, ...
+    'Fractal_Dimension',Fractal_Dimension,'Diffusion_Coefficient',fo.p1/6);
 save([Output_Path,'/',Case_Name,'/',Case_Name,'_Motion Post-Data.mat'],'MPD')
 
 save([Output_Path,'/',Case_Name,'/',Case_Name,'.mat']); %Save all data in the workspace
