@@ -31,7 +31,7 @@ Start1 = tic; %The global timer is on.
 
 %% Case Naming and Output Path Selection
 
-Case_Name = 'NoPili_A5_dt001_T300';
+Case_Name = 'OnePili_P1_L5_dt001_T300';
 % Case_Name = 'Ball_R1_G0_dt001_T300';
 % Output_Path = uigetdir('./','Please select the path to save the results ...'); %For GUI
 Output_Path = './Post-Processing'; %For terminal
@@ -41,13 +41,13 @@ mkdir(Output_Path,Case_Name)
 
 regexPattern = [Case_Name,'_\d+\.mat'];
 VarName = {'Pos','VM','major_axis','minor_axis','G','Pili_Matrix'};
-Tlim = [40,150];
+Tlim = [20,150];
 
 %Checking parameters
-MajA = 2.0e-6;
+MajA = 1.25e-6;
 MinA = 0.4e-6;
 Gravity = 9.81;
-PM = [1;0;0;0;NaN;NaN;NaN;1];
+PM = [1;5;0;0;NaN;NaN;NaN;1];
 
 %% Batch extraction of motion related data
 
@@ -87,7 +87,7 @@ for n = 1:Num_Res
         Trajectories{n} = Trajectory;
         Max_Offset_Ratio(n) = max(vecnorm(Trajectory(2:3,:)))/abs(Trajectory(1,end));
         Final_Offset_Ratio(n) = vecnorm(Trajectory(2:3,end))/abs(Trajectory(1,end));
-        Fractal_Dimension(n) = Calculate_Fractal_Dimension(Trajectory',15);
+        Fractal_Dimension(n) = Calculate_Fractal_Dimension(Trajectory',10);
         saveas(gcf,[Output_Path,'/',Case_Name,'/',Case_Name,'_',Res_Num,'_FD'],'png')%Save this figure
     else
         error('The parameter settings for this case are incorrect !')
@@ -175,7 +175,7 @@ set(gca,'FontName','Times New Roman')
 grid on
 ax = gca; ax.LineWidth = 1.5;
 ax.FontSize = 12;
-title('Offset Ratio Curve','FontSize',24,'FontWeight','bold')
+title('Offset Angle Curve','FontSize',24,'FontWeight','bold')
 xlabel('Δt (s)','FontSize',18);ylabel('Offset Angle (rad)','FontSize',18);
 saveas(gcf,[Output_Path,'/',Case_Name,'/',Case_Name,'_MOA'],'png')%Save this figure
 
@@ -213,4 +213,4 @@ save([Output_Path,'/',Case_Name,'/',Case_Name,'_Motion Post-Data.mat'],'MPD')
 save([Output_Path,'/',Case_Name,'/',Case_Name,'.mat']); %Save all data in the workspace
 
 Run_Time = toc(Start1);
-fprintf('All motion data post-processed in %.2f seconds.\n',Run_Time)
+fprintf('#All motion data post-processed in %.2f seconds.\n',Run_Time)
