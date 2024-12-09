@@ -33,7 +33,9 @@ if gof.adjrsquare >= 0.995
     disp(['The estimated fractal dimension of the trajectory is: ', num2str(Fractal_Dimension),newline]);
 else
     warning('Poor linearity of results, please re-select box size range !')
-    pause
+    Size_Ratio = input('The new value of size ratio: ');
+    Fractal_Dimension = Calculate_Fractal_Dimension(Trajectory,Size_Ratio);
+    return
 end
 
 % Visualization
