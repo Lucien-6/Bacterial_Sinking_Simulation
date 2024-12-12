@@ -8,7 +8,7 @@ close all force
 clear
 clc
 
-for no = 27:36
+for no = 3:25
 
     close all force
     clearvars -except no
@@ -20,7 +20,7 @@ for no = 27:36
 
     StrNo = sprintf('%02d',no);
 
-    Case_Name = ['OnePili_P1_L5_dt001_T300_',StrNo];
+    Case_Name = ['ThreePili_P124_L3_dt001_T300_',StrNo];
     % Output_Path = uigetdir('./','Please select the path to save the results ...'); %For GUI
     Output_Path = './Results'; %For terminal
     mkdir(Output_Path,Case_Name)
@@ -68,14 +68,14 @@ coefficient, the vertical dilatation coefficient and the periodicity coefficient
 The eighth row represents the configuration of the pili on the bacterial
 body, with a total of 1–14 points (see the point schematic for further details).
     %}
-    Pili_Matrix = [1;...
-        5;...
-        0;...
-        0;...
-        nan;...
-        nan;...
-        nan;...
-        1];
+    Pili_Matrix = [1,1,1;...
+        3,3,3;...
+        0,0,0;...
+        0,0,0;...
+        nan,nan,nan;...
+        nan,nan,nan;...
+        nan,nan,nan;...
+        1,2,4];
 
     ppp = 100; %Number of points per micron
     dis = 5e-8; %Distance between the body and the root of pili (must be greater than 0)
@@ -169,7 +169,7 @@ body, with a total of 1–14 points (see the point schematic for further details
 
     Step_Times = zeros(TNum,1); %Array of time-per-step records
 
-    Trans = cell(1,TNum); %Coordinate system rotation matrix
+    Trans = cell(2,TNum); %Coordinate system rotation matrix
 
     U = zeros(3*NALL+6,1); %Expand velocity vector
 
@@ -205,7 +205,15 @@ body, with a total of 1–14 points (see the point schematic for further details
         waitbar(i/TNum,Bar,newStr)
 
         %Update the sinking force at step i in Lagrangian coordinates
-        [Trans{i},US] = Sink_Force_Update(i,Sink_Theta,TStep,Velocity_Log,Force_Direct);
+        [Q,US] = Sink_Force_Update(i,Sink_Theta,TStep,Velocity_Log,Force_Direct);
+
+        if i == 1
+            Trans{1,i} = Q;
+            Trans{2,i} = conj(Q);
+        else
+            Trans{1,i} = Trans{1,i-1}*Q;
+            Trans{2,i} = conj(Q)*Trans{2,i-1};
+        end
 
         Force_Direct = US;
 

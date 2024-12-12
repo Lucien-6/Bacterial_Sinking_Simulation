@@ -6,32 +6,27 @@ function Pos = Calculate_Motion_Trajectory(TNum,major_axis,Velocity_Log,TStep,Tr
 % 2024-10-10
 
 Pos = zeros(9,TNum);
-fprintf(['\nProgress: ',repmat(' ', 1, 6)])
+fprintf(['\nProgress: ',repmat(' ', 1, 7)])
 for j = 1:TNum
     RA = [major_axis;0;0];
     RA = quaternion([0,RA']);
+
+    RA = Trans{1,j}*RA*Trans{2,j};
+    [~,x2,y2,z2] = parts(RA);
+
     if j ==1 %Separate assignment for the first step
         Pos(1:3,j) = zeros(3,1);
-        RA = Trans{1}*RA*conj(Trans{1});
-        [~,x2,y2,z2] = parts(RA);
         Pos(4:6,j) = [x2;y2;z2];
     else
-        %Cumulative inverse rotation computation for solving bacterial trajectory in Eulerian coordinate system
         DR = [Velocity_Log(1,j-1);Velocity_Log(2,j-1);Velocity_Log(3,j-1)].*TStep;
         DR = quaternion([0,DR']);
-        for m = j:-1:2
-            DR2 = Trans{m-1}*DR*conj(Trans{m-1});
-            DR = DR2;
-            RA2 = Trans{m-1}*RA*conj(Trans{m-1});
-            RA = RA2;
-        end
+        DR = Trans{1,j-1}*DR*Trans{2,j-1};
         [~,x1,y1,z1] = parts(DR);
-        [~,x2,y2,z2] = parts(RA);
         Pos(1:3,j) = Pos(1:3,j-1)+[x1;y1;z1]; %Centroid coordinate
         Pos(4:6,j) = Pos(1:3,j)+[x2;y2;z2]; %Coordinates of the one pole
     end
-    fprintf(repmat('\b', 1, 6))
-    fprintf('%5.2f%%',100*j/TNum)
+    fprintf(repmat('\b', 1, 7))
+    fprintf('%6.2f%%',100*j/TNum)
 end
 
 Pos(7:9,:) = Pos(1:3,:).*2.0-Pos(4:6,:); %Use the midpoint property to solve for the other pole
