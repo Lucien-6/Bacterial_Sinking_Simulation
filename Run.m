@@ -20,9 +20,10 @@ for no = 3:25
 
     StrNo = sprintf('%02d',no);
 
-    Case_Name = ['ThreePili_P124_L3_dt001_T300_',StrNo];
+    Case = 'ThreePili_P124_L3_dt001_T300';
+    Case_Name = [Case,'_',StrNo];
     % Output_Path = uigetdir('./','Please select the path to save the results ...'); %For GUI
-    Output_Path = './Results'; %For terminal
+    Output_Path = ['./Results/',Case]; %For terminal
     mkdir(Output_Path,Case_Name)
 
     %% The program starts and turns on logging
