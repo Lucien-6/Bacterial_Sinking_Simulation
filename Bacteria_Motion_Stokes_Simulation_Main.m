@@ -7,7 +7,7 @@ the original program by Prof. Yang Ding of the Beijing Computational Science
 Research Center.
 
 #Creator: Lucien            #Creation time: Oct. 10, 2024
-#Modified by: Lucien       #Last modified time: Dec. 5, 2024
+#Modified by: Lucien       #Last modified time: Dec. 12, 2024
 
 #Modify records:
 ----------------------------- V1.0 --------------------------
@@ -173,7 +173,7 @@ Rand = randn(TNum,6);
 
 Rand = Rand-mean(Rand); %Set the mean to 0 through translation
 
-Brown = sqrt(2*KB*Temper*diag(DFM)./TStep)*0;
+Brown = sqrt(2*KB*Temper*diag(DFM)./TStep);
 
 disp([newline,'Brownian motion stochastic force constructed !'])
 
@@ -184,7 +184,7 @@ disp([newline,'Brownian motion stochastic force constructed !'])
 
 Step_Times = zeros(TNum,1); %Array of time-per-step records
 
-Trans = cell(1,TNum); %Coordinate system rotation matrix
+Trans = cell(2,TNum); %Coordinate system rotation matrix
 
 U = zeros(3*NALL+6,1); %Expand velocity vector
 
@@ -220,7 +220,15 @@ for i = 1:TNum
     waitbar(i/TNum,Bar,newStr)
 
     %Update the sinking force at step i in Lagrangian coordinates
-    [Trans{i},US] = Sink_Force_Update(i,Sink_Theta,TStep,Velocity_Log,Force_Direct);
+    [Q,US] = Sink_Force_Update(i,Sink_Theta,TStep,Velocity_Log,Force_Direct);
+
+    if i == 1
+        Trans{1,i} = Q;
+        Trans{2,i} = conj(Q);
+    else
+        Trans{1,i} = Trans{1,i-1}*Q;
+        Trans{2,i} = conj(Q)*Trans{2,i-1};
+    end
 
     Force_Direct = US;
 
@@ -295,9 +303,9 @@ disp([newline,'Bacterial sinking velocity and MSD is calculated !'])
 
 %% Animating the motion of the bacteria in the Eulerian coordinate system
 
-% disp([newline,'Animating bacterial motion ……'])
-% Bacteria_Motion_Animations(Case_Name,TStep,major_axis,TNum,bac,PR,Trans,Velocity_Log,Pos,Output_Path);
-% disp([newline,'Bacterial motion animation completed !'])
+disp([newline,'Animating bacterial motion ……'])
+Bacteria_Motion_Animations(Case_Name,TStep,major_axis,TNum,bac,PR,Trans,Velocity_Log,Pos,Output_Path);
+disp([newline,'Bacterial motion animation completed !'])
 
 %% Completion of the program and statistical reporting
 

@@ -27,8 +27,8 @@ for n = 1:TNum
     PP = Pili'.*1e6;
     PP = quaternion([zeros(bac.NTail,1),PP]);
     if n == 1
-        Temp1 = Trans{1}*BB*conj(Trans{1});
-        Temp2 = Trans{1}*PP*conj(Trans{1});
+        Temp1 = Trans{1,1}*BB*Trans{2,1};
+        Temp2 = Trans{1,1}*PP*Trans{2,1};
         [~,x2,y2,z2] = parts(Temp1);
         [~,x3,y3,z3] = parts(Temp2);
         B = [x2';y2';z2'];
@@ -36,14 +36,9 @@ for n = 1:TNum
     else
         DR = [Velocity_Log(1,n-1);Velocity_Log(2,n-1);Velocity_Log(3,n-1)].*(TStep*1e6);
         DR = quaternion([0,DR']);
-        for m = n:-1:2
-            DR2 = Trans{m-1}*DR*conj(Trans{m-1});
-            DR = DR2;
-            Temp1 = Trans{m-1}*BB*conj(Trans{m-1});
-            BB = Temp1;
-            Temp2 = Trans{m-1}*PP*conj(Trans{m-1});
-            PP = Temp2;
-        end
+        DR = Trans{1,n-1}*DR*Trans{2,n-1};
+        BB = Trans{1,n-1}*BB*Trans{2,n-1};
+        PP = Trans{1,n-1}*PP*Trans{2,n-1};
         [~,x1,y1,z1] = parts(DR);
         [~,x2,y2,z2] = parts(BB);
         [~,x3,y3,z3] = parts(PP);
@@ -87,10 +82,10 @@ for n = 1:TNum
         legend([p1,p2,p3,p4],{'Pilis','Body','Centroid','Trajectory'},'Location','southeast','LineWidth',1.0)
     end
     hold off;
-    
+
     avi_frame = getframe(avi_figure);
     writeVideo(avi_object,avi_frame);
-    
+
     clf
 end
 

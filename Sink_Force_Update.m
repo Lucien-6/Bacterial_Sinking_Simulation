@@ -1,4 +1,4 @@
-function [Trans,US] = Sink_Force_Update(m,Sink_Theta,TStep,Velocity_Log,Force_Direct)
+function [Q,US] = Sink_Force_Update(m,Sink_Theta,TStep,Velocity_Log,Force_Direct)
 % Sink_Force_Update This function is used to update the vector of sinking forces in the Lagrangian coordinate system
 % e.g. [trans,US] = Sink_Force_Update(i,Sink_Theta,TStep,Velocity_Log,Force_Direct)
 % Created by: Lucien
@@ -27,7 +27,5 @@ V = quaternion([0,Force_Direct']);
 Temp = conj(Q)*V*Q;
 [~,x,y,z] = parts(Temp);
 US = [x;y;z];
-
-Trans = Q;
 
 end
