@@ -1,4 +1,4 @@
-function VarStruct = Extract_Var_from_Files(regexPattern,VarName)
+function VarStruct = Extract_Var_from_Files(regexPattern,VarName,varargin)
 % Extract_Var_from_Files
 % This function loads .mat files with a specific naming format from the user-specified folder and its subfolders,
 % and extracts the variable named VarName from each file, VarName can be a char, or a Cell containing multiple chars.
@@ -6,13 +6,16 @@ function VarStruct = Extract_Var_from_Files(regexPattern,VarName)
 % The file naming format is regexPattern, for example "data_XXXX.mat", where XXXX is a number.
 % The corresponding regular expression is regexPattern = 'data_\d{4}\.mat'.
 
-% Open the file selection dialog for the user to choose a folder
-folderPath = uigetdir('', 'Select the folder containing the required .mat files');
-
-% Check if the user canceled the selection
-if isequal(folderPath, 0)
-    disp('No folder selected, program exits.');
-    return;
+if nargin>2
+    folderPath = varargin{1};
+else
+    % Open the file selection dialog for the user to choose a folder
+    folderPath = uigetdir('', 'Select the folder containing the required .mat files');
+    % Check if the user canceled the selection
+    if isequal(folderPath, 0)
+        disp('No folder selected, program exits.');
+        return;
+    end
 end
 
 if iscell(VarName)
