@@ -102,7 +102,7 @@ Sink_Force = (Density_B-Density_F)*G*Volume_B; %Sinking force on bacteria
 %% Time setting
 
 TStep = 0.01; %Time step size
-TEnd = 300; %Length of time
+TEnd = 10; %Length of time
 TNum = round(TEnd/TStep+1); %Total time step counts
 
 %% Bacteria and pili autonomous movement parameter setting
@@ -288,7 +288,7 @@ disp([newline,'Bacterial trajectory is calculated !'])
 
 disp([newline,'Calculate bacterial sinking velocity and MSD ……'])
 Tlim = zeros(2,1);
-Tlim(1) = max(diag(DFM(4:6,4:6))/(KB*Temper)); %Relaxation time
+Tlim(1) = ceil(max(diag(DFM(4:6,4:6))./(KB*Temper))); %Relaxation time
 Tlim(2) = TEnd/2;
 VM = Calculate_Velocity_MSD(Pos,TStep,Case_Name,Tlim,Output_Path);
 disp([newline,'Bacterial sinking velocity and MSD is calculated !'])
