@@ -32,16 +32,18 @@ Start1 = tic; %The global timer is on.
 
 %% List of cases to be processed
 
-Cases = {'G:\Bacteria Sinking\Brown\OnePili_P2_L3_dt001_T300';
-    'G:\Bacteria Sinking\Brown\OnePili_P11_L3_dt001_T300';
-    'G:\Bacteria Sinking\Brown\TwoPili_P12_L3_dt001_T300';
-    'G:\Bacteria Sinking\Brown\TwoPili_P16_L3_dt001_T300';
-    'G:\Bacteria Sinking\Brown\TwoPili_P17_L3_dt001_T300';
-    'G:\Bacteria Sinking\Brown\TwoPili_P23_L3_dt001_T300';
-    'G:\Bacteria Sinking\Brown\TwoPili_P24_L3_dt001_T300';
-    'G:\Bacteria Sinking\Brown\TwoPili_P27_L3_dt001_T300';
-    'G:\Bacteria Sinking\Brown\TwoPili_P28_L3_dt001_T300';
-    'G:\Bacteria Sinking\Brown\TwoPili_P47_L3_dt001_T300'};
+Cases = {'G:\Bacteria Sinking\Brown\ThreePili_P124_L3_dt001_T300';
+    'G:\Bacteria Sinking\Brown\ThreePili_P126_L3_dt001_T300';
+    'G:\Bacteria Sinking\Brown\ThreePili_P127_L3_dt001_T300';
+    'G:\Bacteria Sinking\Brown\ThreePili_P128_L3_dt001_T300';
+    'G:\Bacteria Sinking\Brown\ThreePili_P129_L3_dt001_T300';
+    'G:\Bacteria Sinking\Brown\ThreePili_P178_L3_dt001_T300';
+    'G:\Bacteria Sinking\Brown\ThreePili_P179_L3_dt001_T300';
+    'G:\Bacteria Sinking\Brown\ThreePili_P234_L3_dt001_T300';
+    'G:\Bacteria Sinking\Brown\ThreePili_P237_L3_dt001_T300';
+    'G:\Bacteria Sinking\Brown\ThreePili_P239_L3_dt001_T300';
+    'G:\Bacteria Sinking\Brown\ThreePili_P247_L3_dt001_T300';
+    'G:\Bacteria Sinking\Brown\ThreePili_P248_L3_dt001_T300'};
 
 for j = 1:length(Cases)
     %% Case Naming and Output Path Selection
@@ -227,6 +229,7 @@ for j = 1:length(Cases)
     save([Output_Path,'/',Case_Name,'/',Case_Name,'_Motion Post-Data.mat'],'MPD')
 
     save([Output_Path,'/',Case_Name,'/',Case_Name,'.mat']); %Save all data in the workspace
+    close all
     disp([Case_Name,' has been processed!',newline])
 
 end
