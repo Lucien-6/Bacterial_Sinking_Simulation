@@ -90,21 +90,21 @@ for j = 1:length(Cases)
             if n==1
                 Times = Temp(:,7);
                 MSD = zeros(length(Times),Num_Res);
-                OA = zeros(length(Times),2);
+                OA = zeros(length(Times),4);
             end
             MSD(:,n) = Temp(:,8);
             Sinking_Velocity(n) = Temp(end,6);
             Mean_Velocity(n) = mean(Temp(:,5));
             Trajectory = Motion.(VarName{1}){n}(1:3,:).*1e6;
-            Final_YZ(n,:) = Trajectory(2:3,end);%Final landing point
+            % Final_YZ(n,:) = Trajectory(2:3,end);%Final landing point
             Pos(:,1) = [0;Times];
             Pos(:,2:4) = Trajectory';
             OA = OA+Offset_Ratio(Pos);%Offset ratio
-            Trajectories{n} = Trajectory;
-            Max_Offset_Ratio(n) = max(vecnorm(Trajectory(2:3,:)))/abs(Trajectory(1,end));
-            Final_Offset_Ratio(n) = vecnorm(Trajectory(2:3,end))/abs(Trajectory(1,end));
-            Fractal_Dimension(n) = Calculate_Fractal_Dimension(Trajectory',10);
-            saveas(gcf,[Output_Path,'/',Case_Name,'/',Case_Name,'_',Res_Num,'_FD'],'png')%Save this figure
+            % Trajectories{n} = Trajectory;
+            % Max_Offset_Ratio(n) = max(vecnorm(Trajectory(2:3,:)))/abs(Trajectory(1,end));
+            % Final_Offset_Ratio(n) = vecnorm(Trajectory(2:3,end))/abs(Trajectory(1,end));
+            % Fractal_Dimension(n) = Calculate_Fractal_Dimension(Trajectory',10);
+            % saveas(gcf,[Output_Path,'/',Case_Name,'/',Case_Name,'_',Res_Num,'_FD'],'png')%Save this figure
         else
             error('The parameter settings for this case are incorrect !')
         end
@@ -186,13 +186,22 @@ for j = 1:length(Cases)
 
     figure('Name','Offset Angle Curve')
     set(gcf,'Position',[20 20 1200 1000])
-    plot(MOA(:,1),MOA(:,2),'r','LineWidth',2.0)
+    P1 = plot(MOA(:,1),MOA(:,2),'b','LineWidth',2.0);
     set(gca,'FontName','Times New Roman')
     grid on
     ax = gca; ax.LineWidth = 1.5;
     ax.FontSize = 12;
     title('Offset Angle Curve','FontSize',24,'FontWeight','bold')
     xlabel('Δt (s)','FontSize',18);ylabel('Offset Angle (rad)','FontSize',18);
+    hold on
+    %Fit the curve
+    CutPoint = ceil(length(MOA(:,1))/2);
+    Func = @(C,X) atan(C./sqrt(X));
+    C = nlinfit(MOA(1:CutPoint,1),MOA(1:CutPoint,2),Func,1);
+    P2 = plot(MOA(:,1),Func(C,MOA(:,1)),'r--','LineWidth',1.5);
+    legend([P1,P2],{'Original Curve','Fitted Curve'})
+    latexf = ['$$\leftarrow y=\arctan(\frac{',num2str(C),'}{\sqrt{(x)}})$$'];
+    text(MOA(CutPoint,1),Func(C,MOA(CutPoint,1)),latexf,'Interpreter','latex','FontSize',18)
     saveas(gcf,[Output_Path,'/',Case_Name,'/',Case_Name,'_MOA'],'png')%Save this figure
 
     figure('Name','Final landing points')
@@ -220,13 +229,15 @@ for j = 1:length(Cases)
 
     MPD = struct('Sinking_Velocity',Sinking_Velocity,'Mean_Velocity',Mean_Velocity, ...
         'Max_Offset_Ratio',Max_Offset_Ratio,'Final_Offset_Ratio',Final_Offset_Ratio, ...
-        'Fractal_Dimension',Fractal_Dimension,'Offset_Angle',MOA,'Diffusion_Coefficient', ...
-        fo.p2/6,'FSV',sqrt(fo.p1));
+        'Fractal_Dimension',Fractal_Dimension,'Mean_Offset_Angle',MOA,'Diffusion_Coefficient', ...
+        fo.p2/6,'Fitted_Sinking_Velocity',sqrt(fo.p1),'Mean_Offset_Coefficient',C);
     % MPD = struct('Sinking_Velocity',Sinking_Velocity,'Mean_Velocity',Mean_Velocity, ...
-    %     'Fractal_Dimension',Fractal_Dimension,'Diffusion_Coefficient',fo.p1/6);
+    %     'Fractal_Dimension',Fractal_Dimension,'Diffusion_Coefficient',fo.p1/6, ...
+    %     'Mean_Offset_Angle',MOA,,'Mean_Offset_Coefficient',C);
     save([Output_Path,'/',Case_Name,'/',Case_Name,'_Motion Post-Data.mat'],'MPD')
 
     save([Output_Path,'/',Case_Name,'/',Case_Name,'.mat']); %Save all data in the workspace
+    close all
     disp([Case_Name,' has been processed!',newline])
 
 end
