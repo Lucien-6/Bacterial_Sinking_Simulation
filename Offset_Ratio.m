@@ -8,18 +8,21 @@ function OR = Offset_Ratio(Trajectory)
 %   second column being the offset ratio.
 
 Num = length(Trajectory(:,1));
-OR = zeros(Num-1,2);
+OR = zeros(Num-1,4);
 OR(:,1) = Trajectory(2:end,1);%Time sequence
 
-Temp = zeros(Num-1,Num-1);
+Temp1 = zeros(Num-1,Num-1);
+Temp2 = zeros(Num-1,Num-1);
 
 for m = 1:Num-1
-    YZ = vecnorm((Trajectory(m+1:end,3:4)-Trajectory(m,3:4)),2,2);
-    X = Trajectory(m+1:end,2)-Trajectory(m,2);
-    Temp(1:end+1-m,m) = atan(YZ./X); 
+    Temp1(1:end+1-m,m) = vecnorm((Trajectory(m+1:end,3:4)-Trajectory(m,3:4)),2,2);
+    Temp2(1:end+1-m,m) = Trajectory(m+1:end,2)-Trajectory(m,2);
 end
 
-Temp(Temp==0) = NaN;
-OR(:,2) = mean(Temp,2,'omitmissing')'; %Offset ratio
+Temp1(Temp1==0) = NaN;
+Temp2(Temp2==0) = NaN;
+OR(:,3) = mean(Temp1,2,'omitmissing')'; 
+OR(:,4) = mean(Temp2,2,'omitmissing')'; 
+OR(:,2) = atan(OR(:,3)./OR(:,4)); %Offset ratio
 
 end
