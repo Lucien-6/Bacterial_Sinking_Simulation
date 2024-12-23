@@ -5,7 +5,7 @@ the 'Bacterial Motion Stokes Simulation' project, ultimately obtaining chart inf
 such as instantaneous velocity, settling velocity, MSD, diffusion coefficient, etc.
 
 #Creator: Lucien            #Creation time: Nov. 15, 2024
-#Modified by: Lucien     #Last modified time: Dec. 15, 2024
+#Modified by: Lucien     #Last modified time: Dec. 16, 2024
 
 #Modify records:
 1. Added average instantaneous velocity and fractal dimension analysis functions.
@@ -19,6 +19,8 @@ rate and the final offset rate, have been added.
 8. Smoothing optimized for mean offset ratio data.
 9. Replace the offset ratio with a better offset angle.
 10. Added batch processing function for cases.
+11. Fixed an algorithmic error in the mean offset angle and introduced the
+concept of mean offset coefficient.
 
 %}
 
@@ -32,23 +34,12 @@ Start1 = tic; %The global timer is on.
 
 %% List of cases to be processed
 
-Cases = {'G:\Bacteria Sinking\Brown\ThreePili_P124_L3_dt001_T300';
-    'G:\Bacteria Sinking\Brown\ThreePili_P126_L3_dt001_T300';
-    'G:\Bacteria Sinking\Brown\ThreePili_P127_L3_dt001_T300';
-    'G:\Bacteria Sinking\Brown\ThreePili_P128_L3_dt001_T300';
-    'G:\Bacteria Sinking\Brown\ThreePili_P129_L3_dt001_T300';
-    'G:\Bacteria Sinking\Brown\ThreePili_P178_L3_dt001_T300';
-    'G:\Bacteria Sinking\Brown\ThreePili_P179_L3_dt001_T300';
-    'G:\Bacteria Sinking\Brown\ThreePili_P234_L3_dt001_T300';
-    'G:\Bacteria Sinking\Brown\ThreePili_P237_L3_dt001_T300';
-    'G:\Bacteria Sinking\Brown\ThreePili_P239_L3_dt001_T300';
-    'G:\Bacteria Sinking\Brown\ThreePili_P247_L3_dt001_T300';
-    'G:\Bacteria Sinking\Brown\ThreePili_P248_L3_dt001_T300'};
+Cases = {};
 
 for j = 1:length(Cases)
     %% Case Naming and Output Path Selection
 
-    Case_Name = Cases{j}(27:end);
+    Case_Name = Cases{j}(60:end);
     disp([Case_Name,' starts processing!',newline])
     % Case_Name = 'Ball_R1_G0_dt001_T300';
     % Output_Path = uigetdir('./','Please select the path to save the results ...'); %For GUI
@@ -98,15 +89,15 @@ for j = 1:length(Cases)
             Sinking_Velocity(n) = Temp(end,6);
             Mean_Velocity(n) = mean(Temp(:,5));
             Trajectory = Motion.(VarName{1}){n}(1:3,:).*1e6;
-            % Final_YZ(n,:) = Trajectory(2:3,end);%Final landing point
+            Final_YZ(n,:) = Trajectory(2:3,end);%Final landing point
             Pos(:,1) = [0;Times];
             Pos(:,2:4) = Trajectory';
             OA = OA+Offset_Ratio(Pos);%Offset ratio
-            % Trajectories{n} = Trajectory;
-            % Max_Offset_Ratio(n) = max(vecnorm(Trajectory(2:3,:)))/abs(Trajectory(1,end));
-            % Final_Offset_Ratio(n) = vecnorm(Trajectory(2:3,end))/abs(Trajectory(1,end));
-            % Fractal_Dimension(n) = Calculate_Fractal_Dimension(Trajectory',10);
-            % saveas(gcf,[Output_Path,'/',Case_Name,'/',Case_Name,'_',Res_Num,'_FD'],'png')%Save this figure
+            Trajectories{n} = Trajectory;
+            Max_Offset_Ratio(n) = max(vecnorm(Trajectory(2:3,:)))/abs(Trajectory(1,end));
+            Final_Offset_Ratio(n) = vecnorm(Trajectory(2:3,end))/abs(Trajectory(1,end));
+            Fractal_Dimension(n) = Calculate_Fractal_Dimension(Trajectory',10);
+            saveas(gcf,[Output_Path,'/',Case_Name,'/',Case_Name,'_',Res_Num,'_FD'],'png')%Save this figure
         else
             error('The parameter settings for this case are incorrect !')
         end
@@ -115,7 +106,8 @@ for j = 1:length(Cases)
 
     Mean_MSD = mean(MSD,2);
     RDC = diff(Mean_MSD)/(6*(Times(2)-Times(1)));%Running diffusion curve
-    MOA = OA./Num_Res;%Mean offset ratio
+    MOA = OA./Num_Res;
+    MOA(:,2) = atan(MOA(:,3)./MOA(:,4));%Mean offset angle 
 
     %% Draw corresponding result charts
 
@@ -197,13 +189,13 @@ for j = 1:length(Cases)
     xlabel('Δt (s)','FontSize',18);ylabel('Offset Angle (rad)','FontSize',18);
     hold on
     %Fit the curve
-    CutPoint = ceil(length(MOA(:,1))/2);
+    CutPoint = ceil(length(MOA(:,1))/3);
     Func = @(C,X) atan(C./sqrt(X));
     C = nlinfit(MOA(1:CutPoint,1),MOA(1:CutPoint,2),Func,1);
     P2 = plot(MOA(:,1),Func(C,MOA(:,1)),'r--','LineWidth',1.5);
     legend([P1,P2],{'Original Curve','Fitted Curve'})
     latexf = ['$$\leftarrow y=\arctan(\frac{',num2str(C),'}{\sqrt{(x)}})$$'];
-    text(MOA(CutPoint,1),Func(C,MOA(CutPoint,1)),latexf,'Interpreter','latex','FontSize',18)
+    text(MOA(ceil(CutPoint/2),1),Func(C,MOA(ceil(CutPoint/2),1)),latexf,'Interpreter','latex','FontSize',18)
     saveas(gcf,[Output_Path,'/',Case_Name,'/',Case_Name,'_MOA'],'png')%Save this figure
 
     figure('Name','Final landing points')
@@ -235,7 +227,7 @@ for j = 1:length(Cases)
         fo.p2/6,'Fitted_Sinking_Velocity',sqrt(fo.p1),'Mean_Offset_Coefficient',C);
     % MPD = struct('Sinking_Velocity',Sinking_Velocity,'Mean_Velocity',Mean_Velocity, ...
     %     'Fractal_Dimension',Fractal_Dimension,'Diffusion_Coefficient',fo.p1/6, ...
-    %     'Mean_Offset_Angle',MOA,,'Mean_Offset_Coefficient',C);
+    %     'Mean_Offset_Angle',MOA,'Mean_Offset_Coefficient',C);
     save([Output_Path,'/',Case_Name,'/',Case_Name,'_Motion Post-Data.mat'],'MPD')
 
     save([Output_Path,'/',Case_Name,'/',Case_Name,'.mat']); %Save all data in the workspace

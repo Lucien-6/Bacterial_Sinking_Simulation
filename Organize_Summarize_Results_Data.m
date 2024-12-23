@@ -44,7 +44,7 @@ fieldNames = fieldnames(MPD{1});
 
 for m = 1:length(fieldNames)
     for n = 1:caseNumber
-        if strcmp(fieldNames{m},'Offset_Angle')
+        if strcmp(fieldNames{m},'Mean_Offset_Angle')
             subData = MPD{n}.(fieldNames{m})(:,2);
         else
             subData = MPD{n}.(fieldNames{m});

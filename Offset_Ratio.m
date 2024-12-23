@@ -23,6 +23,5 @@ Temp1(Temp1==0) = NaN;
 Temp2(Temp2==0) = NaN;
 OR(:,3) = mean(Temp1,2,'omitmissing')'; 
 OR(:,4) = mean(Temp2,2,'omitmissing')'; 
-OR(:,2) = atan(OR(:,3)./OR(:,4)); %Offset ratio
 
 end

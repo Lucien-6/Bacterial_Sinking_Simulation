@@ -57,7 +57,7 @@ G = 9.81; %Gravitational acceleration
 Miu = 0.0008007; %Coefficient of dynamic viscosity
 
 %Parameters of bacterial body (Capsule type)
-major_axis = 0.4e-6; %Major axis length
+major_axis = 1.25e-6; %Major axis length
 minor_axis = 0.4e-6; %minor axis length
 Nhead = 1000; %Number of points
 shift = 1.25; %Force point offset rate
