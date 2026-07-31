@@ -2,11 +2,13 @@ function Bacteria_Motion_Animations(Case_Name,TStep,major_axis,TNum,bac,PR,Trans
 % Bacteria_Motion_Animations This function is used to animate the motion of bacteria in the Eulerian coordinate system
 % e.g. Bacteria_Motion_Animations(Case_Name,TStep,major_axis,TNum,bac,PR,Trans,Velocity_Log,Pos,Output_Path)
 % Created by: Lucien
-% E-mail: 2531989856@qq.com
+% E-mail: lucien-6@qq.com
 % 2024-10-10
+% Modified: 2026-07-31 (V1.1.0) — MPEG-4 profile and capped FrameRate
 
-avi_object = VideoWriter([Output_Path,'/',Case_Name,'/',Case_Name,'_Bac_Movie.mp4']);
-avi_object.FrameRate = 1/TStep;
+movie_path = fullfile(Output_Path, Case_Name, [Case_Name, '_Bac_Movie.mp4']);
+avi_object = VideoWriter(movie_path, 'MPEG-4');
+avi_object.FrameRate = min(30, max(1, round(1 / TStep)));
 avi_object.Quality = 50;
 open(avi_object);
 avi_figure = figure;

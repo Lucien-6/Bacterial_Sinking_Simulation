@@ -5,7 +5,8 @@ the 'Bacterial Motion Stokes Simulation' project, ultimately obtaining chart inf
 such as instantaneous velocity, settling velocity, MSD, diffusion coefficient, etc.
 
 #Creator: Lucien            #Creation time: Nov. 15, 2024
-#Modified by: Lucien     #Last modified time: Dec. 16, 2024
+#Modified by: Lucien     #Last modified time: 2026-07-31
+#Version: 1.1.0
 
 #Modify records:
 1. Added average instantaneous velocity and fractal dimension analysis functions.
@@ -21,6 +22,8 @@ rate and the final offset rate, have been added.
 10. Added batch processing function for cases.
 11. Fixed an algorithmic error in the mean offset angle and introduced the
 concept of mean offset coefficient.
+12. 2026-07-31: folder picker for Cases; robust Case_Name via fileparts;
+    require slanCL Add-On; skip FD figure when estimate is NaN.
 
 %}
 
@@ -33,16 +36,43 @@ clc
 Start1 = tic; %The global timer is on.
 
 %% List of cases to be processed
+% Select either one case folder (contains CaseName_XX.mat) or a parent of case folders.
 
-Cases = {};
+fprintf('Select a case results folder or a parent directory of case folders...\n');
+parent_dir = uigetdir(pwd, 'Select Case Folder or Parent of Cases');
+if parent_dir == 0
+    error('No directory selected. Process terminated.');
+end
+
+[~, selected_name] = fileparts(parent_dir);
+legacy_mats = dir(fullfile(parent_dir, [selected_name, '_*.mat']));
+if ~isempty(legacy_mats)
+    Cases = {parent_dir};
+    fprintf('Detected a single case folder:\n  1. %s\n\n', parent_dir);
+else
+    dir_info = dir(parent_dir);
+    dir_names = {dir_info([dir_info.isdir]).name};
+    dir_names = dir_names(~ismember(dir_names, {'.', '..'}));
+    if isempty(dir_names)
+        error(['No case folders found in: %s\n', ...
+            'Expected either legacy <CaseName>_N.mat files, or subfolders per case.'], parent_dir);
+    end
+    Cases = fullfile(parent_dir, dir_names);
+    if ischar(Cases)
+        Cases = {Cases};
+    end
+    fprintf('Found %d case(s) to process:\n', numel(Cases));
+    for ii = 1:numel(Cases)
+        fprintf('  %d. %s\n', ii, Cases{ii});
+    end
+    fprintf('\n');
+end
 
 for j = 1:length(Cases)
     %% Case Naming and Output Path Selection
 
-    Case_Name = Cases{j}(60:end);
+    [~, Case_Name] = fileparts(Cases{j});
     disp([Case_Name,' starts processing!',newline])
-    % Case_Name = 'Ball_R1_G0_dt001_T300';
-    % Output_Path = uigetdir('./','Please select the path to save the results ...'); %For GUI
     Output_Path = './Post-Processing'; %For terminal
     mkdir(Output_Path,Case_Name)
 
@@ -97,7 +127,9 @@ for j = 1:length(Cases)
             Max_Offset_Ratio(n) = max(vecnorm(Trajectory(2:3,:)))/abs(Trajectory(1,end));
             Final_Offset_Ratio(n) = vecnorm(Trajectory(2:3,end))/abs(Trajectory(1,end));
             Fractal_Dimension(n) = Calculate_Fractal_Dimension(Trajectory',10);
-            saveas(gcf,[Output_Path,'/',Case_Name,'/',Case_Name,'_',Res_Num,'_FD'],'png')%Save this figure
+            if ~isnan(Fractal_Dimension(n)) && ~isempty(get(0, 'CurrentFigure'))
+                saveas(gcf,[Output_Path,'/',Case_Name,'/',Case_Name,'_',Res_Num,'_FD'],'png')%Save this figure
+            end
         else
             error('The parameter settings for this case are incorrect !')
         end
@@ -112,6 +144,9 @@ for j = 1:length(Cases)
     %% Draw corresponding result charts
 
     Simple = 5;
+    assert(exist('slanCL', 'file') == 2, ...
+        ['slanCL not found on the MATLAB path. Install the MATLAB Add-On ', ...
+         '"2000 palettes" (slanCL), then re-run this script.']);
     Clist = slanCL(821);
     Tags = randi([1 Num_Res],Simple,1);
 

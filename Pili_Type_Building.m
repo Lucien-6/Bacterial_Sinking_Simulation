@@ -2,8 +2,15 @@ function Pili_str = Pili_Type_Building(PM,Ntail)
 % Pili_Type_Building This function is used to construct the desired type of pili morphology
 % e.g. Pili_str = Pili_Type_Building(PM,Ntail)
 % Created by: Lucien
-% E-mail: 2531989856@qq.com
+% E-mail: lucien-6@qq.com
 % 2024-10-10
+% Modified by: Lucien       Last modified: 2026-07-31 (V1.1.0)
+
+if Ntail < 2
+    Pili_str = struct('rxtail', [], 'rytail', [], 'rztail', [], ...
+        'gxtail', [], 'gytail', [], 'gztail', []);
+    return
+end
 
 Pili_Type = PM(1); %Type of pili
 L_helix = PM(2); %Length of pili

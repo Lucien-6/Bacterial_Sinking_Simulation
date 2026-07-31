@@ -1,11 +1,14 @@
 function OR = Offset_Ratio(Trajectory)
-%Offset_Ratio This function is used to calculate the offset curve of particle.
-%   This function is used to compute the offset ratio-time curve of a particle 
-%   based on its three-dimensional motion trajectory. The input is the trajectory 
-%   of the particle, which is stored as an N×4 matrix in the format of (t,x,y,z); 
-%   the output is the offset rate-time data of the particle, which is output in the 
-%   format of an N×2 matrix, with the first column being the delay time and the 
-%   second column being the offset ratio.
+%Offset_Ratio Compute offset statistics along a particle trajectory.
+%   Input: Trajectory is an N×4 matrix (t, x, y, z).
+%   Output: OR is an (N-1)×4 matrix:
+%       col1 - delay time
+%       col2 - offset ratio = mean lateral displacement / mean axial displacement
+%       col3 - mean lateral displacement in YZ
+%       col4 - mean axial displacement in X
+% Created by: Lucien
+% E-mail: lucien-6@qq.com
+% Modified: 2026-07-31 (V1.1.0)
 
 Num = length(Trajectory(:,1));
 OR = zeros(Num-1,4);
@@ -23,5 +26,10 @@ Temp1(Temp1==0) = NaN;
 Temp2(Temp2==0) = NaN;
 OR(:,3) = mean(Temp1,2,'omitmissing')'; 
 OR(:,4) = mean(Temp2,2,'omitmissing')'; 
+
+% Offset ratio (lateral / axial); protect near-zero axial mean
+OR(:,2) = OR(:,3) ./ OR(:,4);
+tiny_axial = abs(OR(:,4)) < 1e-15 | isnan(OR(:,4));
+OR(tiny_axial, 2) = NaN;
 
 end

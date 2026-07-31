@@ -1,0 +1,26 @@
+# Bacteria Motion Stokes Simulation — runtime requirements
+# Version: 1.1.0
+# Updated: 2026-07-31
+# Creator: Lucien <lucien-6@qq.com>
+#
+# This is a MATLAB project. Install the items below in MATLAB rather than via pip.
+
+[matlab]
+product = MATLAB
+# Verified on: R2026a
+# Recommended minimum: R2020b (quaternion, equilibrate, VideoWriter MPEG-4)
+
+[toolboxes]
+# Used by Calculate_Velocity_MSD / Motion_Data_Extract_Process fitting
+Curve Fitting Toolbox
+# Used by Motion_Data_Extract_Process (nlinfit)
+Statistics and Machine Learning Toolbox
+
+[matlab_addons]
+# Required only for Motion_Data_Extract_Process color palettes
+# Add-On name: "2000 palettes" (function: slanCL)
+slanCL
+
+[optional]
+# Parallel Computing Toolbox — not required by the serial Run.m workflow
+# Image Processing Toolbox — not required for the core Stokes solver

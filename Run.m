@@ -1,6 +1,6 @@
-%% ---------------------Bacteria Motion Stokes Simulation V1.0 ----------------------- %%
-
-% This version is used for batch calculation runs.
+%% ---------------------Bacteria Motion Stokes Simulation V1.1 ----------------------- %%
+% Version: 1.1.0 | Updated: 2026-07-31 | Creator: Lucien <lucien-6@qq.com>
+% This script is used for serial batch calculation runs.
 
 %% Clear the cache
 
@@ -92,10 +92,12 @@ body, with a total of 1–14 points (see the point schematic for further details
     TNum = round(TEnd/TStep+1); %Total time step counts
 
     %% Bacteria and pili autonomous movement parameter setting
+    % NOTE (this flat V1.1 build): bodyU / U_tail / T_tail are NOT used by the
+    % solver. Changing them has no effect until Contract-branch dynamics are merged.
 
-    bodyU = [0.0 0.0 0.0 0.0 0.0 0.0]; %Velocity of active movement of the bacterial body
-    U_tail = [0.0 0.0].*1e-6; %Speed of extension and contraction of pili (+contraction, -extension)
-    T_tail = [20 20]; %The action cycle of the pili
+    bodyU = [0.0 0.0 0.0 0.0 0.0 0.0]; %#ok<NASGU> % unused in this build
+    U_tail = [0.0 0.0].*1e-6; %#ok<NASGU> % unused in this build
+    T_tail = [20 20]; %#ok<NASGU> % unused in this build
 
     %% Bacteria initial posture and gravity direction setting
 
@@ -124,12 +126,15 @@ body, with a total of 1–14 points (see the point schematic for further details
     %Expand Green's function matrix
     M = Expanded_Green_Function_Matrix(NALL,Nhead,bac,major_axis,Mall);
 
+    cM = condest(M);
+    if cM > 1e16
+        warning('Green matrix ill-conditioned: condest(M)=%.3e. Check Nhead/shift/epsA.', cM);
+    end
+
     % Optimization for the expand Green's function matrix for subsequent convergence of the solution
-    %Condest1 = condest(M);
     [P,R,C] = equilibrate(M);
     B = R*P*M*C;
     BB = B\eye(3*NALL+6,3*NALL+6);
-    %Condest2 = condest(B);
 
     U = zeros(3*NALL+6,1); %Expand velocity vector
 
@@ -149,6 +154,9 @@ body, with a total of 1–14 points (see the point schematic for further details
     %Decoupling the friction matrix
     DFM = Decouping_Friction_Matrix(FM);
 
+    % Large dense factors are no longer needed in the time loop (use FM\F)
+    clearvars Mall M B BB U UU Temp_Force Force Temp_FM EFT P R C
+
     disp([newline,'The friction coefficient matrix is calculated !'])
 
     %% Construct Brownian motion stochastic forces
@@ -165,21 +173,16 @@ body, with a total of 1–14 points (see the point schematic for further details
 
     %% Formally enter the simulation iterative computation
 
-    % CountS = 0; %Iteration success step count
-    % CountF = 0; %Iteration success step count
-
     Step_Times = zeros(TNum,1); %Array of time-per-step records
 
     Trans = cell(2,TNum); %Coordinate system rotation matrix
 
-    U = zeros(3*NALL+6,1); %Expand velocity vector
-
     Velocity_Log = zeros(6,TNum); %Velocity records
-    Force_Log = zeros(6,TNum); %Joint force records
+    Force_Log = zeros(6,TNum); %Applied generalized force/torque records
 
     PR = cell(1,TNum); %Pili morphology recording cell
 
-    Bar = waitbar(0,'1','Name','BMSS_V1.0 Running',...
+    Bar = waitbar(0,'1','Name','BMSS_V1.1 Running',...
         'CreateCancelBtn','setappdata(gcbf,''canceling'',1)');
     set(Bar,"Position",[500 500 275 100])
     setappdata(Bar,'canceling',0); %Waitbar setting
@@ -221,41 +224,15 @@ body, with a total of 1–14 points (see the point schematic for further details
         %Model checking
         % Model_Checking(bac)
 
-        %Calculate the external force on the fluid surrounding the bacterial body at this time
-        U(3*NALL+1:3*NALL+3) = Force_Direct'+Rand(i,1:3).*Brown(1:3)';
-        U(3*NALL+4:3*NALL+6) = Rand(i,4:6).*Brown(4:6)';
-
-        UU = R*P*U; %The corresponding transformations for U
-
-        %  [Force,flag] = gmres(B,UU,3*NALL,1e-10); %1e-10 is the convergence threshold
-        % %Feedback and counting of iteration results
-        % if flag == 0
-        %     fprintf('#Step %d Iterative convergence success ! \n',i)
-        %     CountS = CountS+1;
-        % else
-        %     warning('Step %d Iteration convergence failure ! \n',i)
-        %     CountF = CountF+1;
-        % end
-
-        Temp_Force = BB*UU; %Solving systems of equations
-
-        Force = C*Temp_Force; %Inverse back to the actual Force vector
+        % Applied generalized force/torque (gravity + Brownian) and mobility solve
+        F = zeros(6, 1);
+        F(1:3) = Force_Direct' + Rand(i, 1:3) .* Brown(1:3)';
+        F(4:6) = Rand(i, 4:6) .* Brown(4:6)';
+        Force_Log(:, i) = F;
+        Velocity_Log(:, i) = FM \ F;
 
         fprintf(['--------------------------------------------------------------\n' ...
             '#Step %d Iterative computation completed ! \n'],i)
-
-        % % Record data on the velocity of the bacteria at the step and the external force applied to it
-        Velocity_Log(1:6,i) = Force(3*NALL+1:3*NALL+6);
-
-        Force_Log(1,i) = -sum(Force(1:NALL)); %External force in the x-direction
-        Force_Log(2,i) = -sum(Force((NALL)+1:2*NALL)); %External force in the y-direction
-        Force_Log(3,i) = -sum(Force(2*NALL+1:3*NALL)); %External force in the z-direction
-
-        gX=[bac.gxH bac.gxT bac.gyH bac.gyT bac.gzH bac.gzT]'; %Construct the array of force point coordinates
-
-        Force_Log(4,i) = sum(-gX(NALL+1:2*NALL).*Force(2*NALL+1:3*NALL)+Force(NALL+1:2*NALL).*gX(2*NALL+1:3*NALL)); %External torque in the x-direction
-        Force_Log(5,i) = sum(-gX(2*NALL+1:3*NALL).*Force(1:NALL)+Force(2*NALL+1:3*NALL).*(gX(1:NALL)-major_axis)); %External torque in the y-direction
-        Force_Log(6,i) = sum(-(gX(1:NALL)-major_axis).*Force(1+NALL:2*NALL)+Force(1:NALL).*gX(1+NALL:2*NALL)); %External torque in the z-direction
 
         %Record the relative position of pili and morphological data for the step
         PR{i} = [bac.rxT;bac.ryT;bac.rzT];
@@ -296,7 +273,7 @@ body, with a total of 1–14 points (see the point schematic for further details
     %% Completion of the program and statistical reporting
 
     Time = toc(Start1);
-    clearvars Force_Direct hour minute bHead pili second U US UU B BB C M Mall P R Bar newStr str%Clear intermediate variables to save space
+    clearvars Force_Direct hour minute bHead pili second US Bar newStr str F Q
     save([Output_Path,'/',Case_Name,'/',Case_Name,'.mat']); %Save all data in the workspace
     % fprintf('\n@Total time steps：%d ，Convergence steps：%d 、Failed steps：%d !\n',TNum,CountS,CountF);
     fprintf('\n@Total running time：%6.2f hours\n\n',Time/3600);
