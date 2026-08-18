@@ -1,4 +1,4 @@
-%% ---------------------Bacteria Motion Stokes Simulation V1.1 ----------------------- %%
+%% ---------------------Bacteria Motion Stokes Simulation V1.1.1 ----------------------- %%
 %{
 This program uses the Stokes method to numerically simulate the motion of
 bacteria in liquids, the relevant variables are all in international basic units or 
@@ -7,10 +7,14 @@ the original program by Prof. Yang Ding of the Beijing Computational Science
 Research Center.
 
 #Creator: Lucien            #Creation time: Oct. 10, 2024
-#Modified by: Lucien       #Last modified time: 2026-07-31
-#Version: 1.1.0
+#Modified by: Lucien       #Last modified time: 2026-08-18
+#Version: 1.1.1
 
 #Modify records:
+----------------------------- V1.1.1 (2026-08-18) --------------------------
+1. Version bump; batch runner defaults and vendored slanCL (see Run.m / CHANGELOG).
+2. Main-program fluid, pili, and time defaults aligned with Run.m.
+
 ----------------------------- V1.1.0 (2026-07-31) --------------------------
 1. Zero-angle quaternion guard in Sink_Force_Update.
 2. True no-pili via Pili_Matrix = zeros(8,0); safe skip of invalid columns.
@@ -56,12 +60,12 @@ fprintf('@The program start time is: %s \n\n',string(datetime));
 
 %% Liquid environment, bacterial body and pili parameter setting
 
-%Parameters of liquid（water at 30℃）
-Temper = 303.15; %Kelvin temperature
+%Parameters of liquid（water at 20℃）
+Temper = 293.15; %Kelvin temperature
 KB = 1.380649e-23; %Boltzmann constant
-Density_F = 995.676; %Density
+Density_F = 998.232; %Density
 G = 9.81; %Gravitational acceleration
-Miu = 0.0008007; %Coefficient of dynamic viscosity
+Miu = 0.001; %Coefficient of dynamic viscosity
 
 %Parameters of bacterial body (Capsule type)
 major_axis = 1.25e-6; %Major axis length
@@ -91,7 +95,14 @@ The eighth row represents the configuration of the pili on the bacterial
 body, with a total of 1–14 points (see the point schematic for further details).
 Use Pili_Matrix = zeros(8,0) for a true no-pili configuration.
 %}
-Pili_Matrix = zeros(8, 0); % True no-pili body (B1)
+Pili_Matrix = [1,1,1;...
+    3,3,3;...
+    0,0,0;...
+    0,0,0;...
+    nan,nan,nan;...
+    nan,nan,nan;...
+    nan,nan,nan;...
+    1,2,4];
 
 ppp = 100; %Number of points per micron
 dis = 5e-8; %Distance between the body and the root of pili (must be greater than 0)
@@ -103,11 +114,11 @@ Sink_Force = (Density_B-Density_F)*G*Volume_B; %Sinking force on bacteria
 %% Time setting
 
 TStep = 0.01; %Time step size
-TEnd = 10; %Length of time
+TEnd = 200; %Length of time
 TNum = round(TEnd/TStep+1); %Total time step counts
 
 %% Bacteria and pili autonomous movement parameter setting
-% NOTE (this flat V1.1 build): bodyU / U_tail / T_tail are NOT used by the
+% NOTE (this flat V1.1.1 build): bodyU / U_tail / T_tail are NOT used by the
 % solver. Changing them has no effect. Active swimming / pili extension will
 % require merging the Contract-branch dynamics modules.
 
@@ -198,7 +209,7 @@ Force_Log = zeros(6,TNum); %Applied generalized force/torque records
 
 PR = cell(1,TNum); %Pili morphology recording cell
 
-Bar = waitbar(0,'1','Name','BMSS_V1.1 Running',...
+Bar = waitbar(0,'1','Name','BMSS_V1.1.1 Running',...
     'CreateCancelBtn','setappdata(gcbf,''canceling'',1)');
 set(Bar,"Position",[500 500 275 100])
 setappdata(Bar,'canceling',0); %Waitbar setting

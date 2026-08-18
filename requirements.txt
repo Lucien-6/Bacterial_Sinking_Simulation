@@ -1,6 +1,6 @@
 # Bacteria Motion Stokes Simulation — runtime requirements
-# Version: 1.1.0
-# Updated: 2026-07-31
+# Version: 1.1.1
+# Updated: 2026-08-18
 # Creator: Lucien <lucien-6@qq.com>
 #
 # This is a MATLAB project. Install the items below in MATLAB rather than via pip.
@@ -19,6 +19,8 @@ Statistics and Machine Learning Toolbox
 [matlab_addons]
 # Required only for Motion_Data_Extract_Process color palettes
 # Add-On name: "2000 palettes" (function: slanCL)
+# Vendored in this repository: MATLAB Add-On/2000 palettes/slanCL
+# Add that folder to the MATLAB path (or install from MATLAB File Exchange).
 slanCL
 
 [optional]

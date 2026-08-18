@@ -4,7 +4,7 @@ function Pili_str = Pili_Type_Building(PM,Ntail)
 % Created by: Lucien
 % E-mail: lucien-6@qq.com
 % 2024-10-10
-% Modified by: Lucien       Last modified: 2026-07-31 (V1.1.0)
+% Modified by: Lucien       Last modified: 2026-08-18 (V1.1.1)
 
 if Ntail < 2
     Pili_str = struct('rxtail', [], 'rytail', [], 'rztail', [], ...

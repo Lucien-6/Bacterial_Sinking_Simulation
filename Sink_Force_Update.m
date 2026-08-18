@@ -4,7 +4,7 @@ function [Q,US] = Sink_Force_Update(m,Sink_Theta,TStep,Velocity_Log,Force_Direct
 % Created by: Lucien
 % E-mail: lucien-6@qq.com
 % 2024-10-10
-% Modified by: Lucien       Last modified: 2026-07-31 (V1.1.0)
+% Modified by: Lucien       Last modified: 2026-08-18 (V1.1.1)
 %   - Guard against zero angular increment (avoid W./Theta -> NaN)
 
 if m == 1 && any(Sink_Theta)%Separate assignment for the first step

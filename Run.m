@@ -1,5 +1,5 @@
-%% ---------------------Bacteria Motion Stokes Simulation V1.1 ----------------------- %%
-% Version: 1.1.0 | Updated: 2026-07-31 | Creator: Lucien <lucien-6@qq.com>
+%% ---------------------Bacteria Motion Stokes Simulation V1.1.1 ----------------------- %%
+% Version: 1.1.1 | Updated: 2026-08-18 | Creator: Lucien <lucien-6@qq.com>
 % This script is used for serial batch calculation runs.
 
 %% Clear the cache
@@ -35,7 +35,7 @@ for no = 1:100
 
     %% Liquid environment, bacterial body and pili parameter setting
 
-    %Parameters of liquid（water at 30℃）
+    %Parameters of liquid（water at 20℃）
     Temper = 293.15; %Kelvin temperature
     KB = 1.380649e-23; %Boltzmann constant
     Density_F = 998.232; %Density
@@ -92,7 +92,7 @@ body, with a total of 1–14 points (see the point schematic for further details
     TNum = round(TEnd/TStep+1); %Total time step counts
 
     %% Bacteria and pili autonomous movement parameter setting
-    % NOTE (this flat V1.1 build): bodyU / U_tail / T_tail are NOT used by the
+    % NOTE (this flat V1.1.1 build): bodyU / U_tail / T_tail are NOT used by the
     % solver. Changing them has no effect until Contract-branch dynamics are merged.
 
     bodyU = [0.0 0.0 0.0 0.0 0.0 0.0]; %#ok<NASGU> % unused in this build
@@ -182,7 +182,7 @@ body, with a total of 1–14 points (see the point schematic for further details
 
     PR = cell(1,TNum); %Pili morphology recording cell
 
-    Bar = waitbar(0,'1','Name','BMSS_V1.1 Running',...
+    Bar = waitbar(0,'1','Name','BMSS_V1.1.1 Running',...
         'CreateCancelBtn','setappdata(gcbf,''canceling'',1)');
     set(Bar,"Position",[500 500 275 100])
     setappdata(Bar,'canceling',0); %Waitbar setting

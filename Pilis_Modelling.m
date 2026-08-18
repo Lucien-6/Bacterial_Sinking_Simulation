@@ -6,7 +6,7 @@ function pili = Pilis_Modelling(Pili_Matrix,ppp,major_axis,minor_axis,dis)
 % Created by: Lucien
 % E-mail: lucien-6@qq.com
 % 2024-10-10
-% Modified by: Lucien       Last modified: 2026-07-31 (V1.1.0)
+% Modified by: Lucien       Last modified: 2026-08-18 (V1.1.1)
 
 if isempty(Pili_Matrix) || size(Pili_Matrix, 2) == 0
     pili = struct( ...

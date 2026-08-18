@@ -4,7 +4,7 @@ function Bacteria_Motion_Animations(Case_Name,TStep,major_axis,TNum,bac,PR,Trans
 % Created by: Lucien
 % E-mail: lucien-6@qq.com
 % 2024-10-10
-% Modified: 2026-07-31 (V1.1.0) — MPEG-4 profile and capped FrameRate
+% Modified: 2026-08-18 (V1.1.1) — MPEG-4 profile and capped FrameRate
 
 movie_path = fullfile(Output_Path, Case_Name, [Case_Name, '_Bac_Movie.mp4']);
 avi_object = VideoWriter(movie_path, 'MPEG-4');

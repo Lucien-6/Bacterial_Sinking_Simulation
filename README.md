@@ -1,7 +1,7 @@
 # Bacteria Motion Stokes Simulation
 
-**Version:** 1.1.0  
-**Updated:** 2026-07-31  
+**Version:** 1.1.1  
+**Updated:** 2026-08-18  
 **Creator:** Lucien  
 **Email:** lucien-6@qq.com  
 
@@ -9,7 +9,7 @@ Low-Reynolds-number (Stokes) numerical simulation of capsule-shaped bacteria in 
 
 ---
 
-## Features (V1.1)
+## Features (V1.1.1)
 
 - Capsule body point-cloud modeling with inward-shifted force points
 - Static pili geometry (5 morphologies, 14 body loci); true no-pili via `zeros(8,0)`
@@ -17,8 +17,9 @@ Low-Reynolds-number (Stokes) numerical simulation of capsule-shaped bacteria in 
 - Gravity + diagonal Brownian forcing with quaternion attitude updates
 - Trajectory, velocity, and MSD analysis; optional MPEG-4 animation
 - Batch runs (`Run.m`) and case post-processing
+- Vendored `slanCL` palettes under `MATLAB Add-On/2000 palettes/`
 
-**Not included in V1.1:** active body swimming (`bodyU`) and pili extension/contraction (`U_tail` / `T_tail`). Those parameters are placeholders only.
+**Not included in V1.1.x:** active body swimming (`bodyU`) and pili extension/contraction (`U_tail` / `T_tail`). Those parameters are placeholders only.
 
 ---
 
@@ -31,7 +32,7 @@ See [`requirements.txt`](requirements.txt).
 | MATLAB | Verified on R2026a; R2020b+ recommended |
 | Curve Fitting Toolbox | MSD / box-count fits |
 | Statistics and Machine Learning Toolbox | `nlinfit` in post-processing |
-| Add-On `slanCL` | Trajectory color palettes in `Motion_Data_Extract_Process` |
+| Add-On `slanCL` | Trajectory color palettes; bundled at `MATLAB Add-On/2000 palettes/slanCL` |
 
 ---
 
@@ -75,6 +76,7 @@ Full usage details: [`docs/USER_GUIDE.md`](docs/USER_GUIDE.md).
 | `docs/USER_GUIDE.md` | User guide |
 | `CHANGELOG.md` | Version history |
 | `VERSION` | Current version string |
+| `MATLAB Add-On/2000 palettes/` | Vendored `slanCL` palettes for post-processing |
 
 Outputs default to `./Results/` (simulations) and `./Post-Processing/` (analysis).
 
@@ -83,8 +85,10 @@ Outputs default to `./Results/` (simulations) and `./Post-Processing/` (analysis
 ## Key parameters
 
 ```matlab
-% Fluid (default: water at 30 °C)
+% Fluid — Main Test default: water at 30 °C
 Temper = 303.15;  Density_F = 995.676;  Miu = 0.0008007;
+% Fluid — Run.m batch default: water at 20 °C
+% Temper = 293.15;  Density_F = 998.232;  Miu = 0.001;
 
 % Capsule body
 major_axis = 1.25e-6;  minor_axis = 0.4e-6;  Nhead = 1000;
@@ -93,7 +97,8 @@ major_axis = 1.25e-6;  minor_axis = 0.4e-6;  Nhead = 1000;
 Pili_Matrix = zeros(8, 0);
 % Or columns: [type; length_um; ...; locus 1-14]
 
-TStep = 0.01;  TEnd = 10;   % Main Test defaults
+TStep = 0.01;  TEnd = 10;    % Main Test defaults
+% TEnd = 200;                 % Run.m batch default
 ```
 
 Time loop uses the precomputed mobility relation `U = FM \ F` (gravity + Brownian).
@@ -104,6 +109,7 @@ Time loop uses the precomputed mobility relation `U = FM \ F` (gravity + Brownia
 
 | Version | Date | Summary |
 |---------|------|---------|
+| 1.1.1 | 2026-08-18 | Batch 20 °C fluid defaults; vendored `slanCL` add-on |
 | 1.1.0 | 2026-07-31 | Robustness & performance maintenance release |
 | 1.0.0 | 2024-12-23 | Flat-layout baseline (`Periodic Backup`) |
 

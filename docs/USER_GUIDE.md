@@ -1,10 +1,10 @@
 # User Guide — Bacteria Motion Stokes Simulation
 
-**Version:** 1.1.0  
-**Updated:** 2026-07-31  
+**Version:** 1.1.1  
+**Updated:** 2026-08-18  
 **Creator:** Lucien \<lucien-6@qq.com\>  
 
-This guide explains how to run simulations, interpret outputs, and use post-processing tools for the flat V1.1 project layout.
+This guide explains how to run simulations, interpret outputs, and use post-processing tools for the flat V1.1.1 project layout.
 
 ---
 
@@ -22,7 +22,7 @@ F = [F_sink + F_Brownian; T_Brownian]
 U = FM \ F
 ```
 
-Geometry is built **once** before the time loop (static pili). Active swimming and pili length cycling are **not** enabled in V1.1.
+Geometry is built **once** before the time loop (static pili). Active swimming and pili length cycling are **not** enabled in V1.1.x.
 
 ---
 
@@ -30,7 +30,7 @@ Geometry is built **once** before the time loop (static pili). Active swimming a
 
 1. Install MATLAB (R2020b+; verified on R2026a).  
 2. Install toolboxes listed in `requirements.txt`.  
-3. For post-processing color maps, install Add-On **2000 palettes** (`slanCL`).  
+3. For post-processing color maps, add `MATLAB Add-On/2000 palettes/slanCL` to the MATLAB path (or install Add-On **2000 palettes**).  
 4. `cd` to the project root (folder containing `Bacteria_Motion_Stokes_Simulation_Main.m`).
 
 No `init_project_paths` is required in the flat layout — all `.m` files live in the project root.
@@ -60,7 +60,7 @@ Default pili: `Pili_Matrix = zeros(8,0)` (no pili)
 | `Nhead` | Body surface point count (cost ~ O(N²–N³) at setup) |
 | `Temper`, `Density_F`, `Miu` | Fluid properties (default 30 °C water) |
 
-Placeholders **without effect** in V1.1: `bodyU`, `U_tail`, `T_tail`.
+Placeholders **without effect** in V1.1.x: `bodyU`, `U_tail`, `T_tail`.
 
 ### 3.3 Outputs (`Results/<Case_Name>/`)
 
@@ -75,7 +75,7 @@ Animation is **off** by default. To enable, uncomment the `Bacteria_Motion_Anima
 
 ### 3.4 Waitbar
 
-Cancel via the waitbar button. Title shows `BMSS_V1.1`.
+Cancel via the waitbar button. Title shows `BMSS_V1.1.1`.
 
 ---
 
@@ -83,6 +83,7 @@ Cancel via the waitbar button. Title shows `BMSS_V1.1`.
 
 1. Open `Run.m`.  
 2. Set `Case`, `Pili_Matrix`, `TEnd`, and the loop `for no = ...`.  
+   Default batch fluid is **20 °C water** (`Temper = 293.15`, `Density_F = 998.232`, `Miu = 0.001`), `TEnd = 200` s, `for no = 1:100`.  
 3. Run:
 
 ```matlab
@@ -129,7 +130,7 @@ Motion_Data_Extract_Process
 2. Script extracts `Pos` / `VM`, computes ensemble MSD, offset angle, fractal dimension, landing points, etc.  
 3. Writes under `./Post-Processing/<Case_Name>/`, including `*_Motion Post-Data.mat`.
 
-Requires `slanCL` on the path (asserted at plot time). Failed fractal fits become `NaN` and skip the FD figure.
+Requires `slanCL` on the path (asserted at plot time; bundled under `MATLAB Add-On/2000 palettes/slanCL`). Failed fractal fits become `NaN` and skip the FD figure.
 
 ### 6.2 `Organize_Summarize_Results_Data`
 
@@ -141,7 +142,7 @@ Pick a folder of post-processed cases containing `*_Motion Post-Data.mat`, then 
 
 ---
 
-## 7. Numerical notes (V1.1)
+## 7. Numerical notes (V1.1.1)
 
 - After assembling `M`, if `condest(M) > 1e16`, a warning is issued. Large condition numbers are common for fine discretizations; check `Nhead`, `shift`, and `epsA` if results look unstable.  
 - Setup still builds and inverts the dense equilibrated system once to obtain `FM`; the time loop is cheap (`6×6`).  
@@ -154,9 +155,9 @@ Pick a folder of post-processed cases containing `*_Motion Post-Data.mat`, then 
 | Symptom | Likely cause | Action |
 |---------|--------------|--------|
 | `Unrecognized function or variable` | Wrong working directory | `cd` to project root |
-| `slanCL not found` | Add-On missing | Install “2000 palettes” / `slanCL` |
+| `slanCL not found` | Add-On missing / not on path | Add `MATLAB Add-On/2000 palettes/slanCL` to the MATLAB path |
 | Ill-conditioned Green matrix warning | Fine mesh / geometry | Reduce `Nhead` or revisit `shift`/`epsA` |
-| Changing `U_tail` has no effect | Not wired in V1.1 | Expected; see Contract-branch for dynamics |
+| Changing `U_tail` has no effect | Not wired in V1.1.x | Expected; see Contract-branch for dynamics |
 | Animation file / codec issues | Profile or empty frames | Use uncommented MPEG-4 path; ensure frames are written |
 
 ---
@@ -170,4 +171,4 @@ Pick a folder of post-processed cases containing `*_Motion Post-Data.mat`, then 
 
 ---
 
-**Last updated:** 2026-07-31  
+**Last updated:** 2026-08-18  

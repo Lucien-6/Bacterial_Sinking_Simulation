@@ -8,7 +8,7 @@ function OR = Offset_Ratio(Trajectory)
 %       col4 - mean axial displacement in X
 % Created by: Lucien
 % E-mail: lucien-6@qq.com
-% Modified: 2026-07-31 (V1.1.0)
+% Modified: 2026-08-18 (V1.1.1)
 
 Num = length(Trajectory(:,1));
 OR = zeros(Num-1,4);

@@ -5,8 +5,8 @@ the 'Bacterial Motion Stokes Simulation' project, ultimately obtaining chart inf
 such as instantaneous velocity, settling velocity, MSD, diffusion coefficient, etc.
 
 #Creator: Lucien            #Creation time: Nov. 15, 2024
-#Modified by: Lucien     #Last modified time: 2026-07-31
-#Version: 1.1.0
+#Modified by: Lucien     #Last modified time: 2026-08-18
+#Version: 1.1.1
 
 #Modify records:
 1. Added average instantaneous velocity and fractal dimension analysis functions.
@@ -24,6 +24,7 @@ rate and the final offset rate, have been added.
 concept of mean offset coefficient.
 12. 2026-07-31: folder picker for Cases; robust Case_Name via fileparts;
     require slanCL Add-On; skip FD figure when estimate is NaN.
+13. 2026-08-18 (V1.1.1): slanCL palettes vendored under MATLAB Add-On/2000 palettes.
 
 %}
 

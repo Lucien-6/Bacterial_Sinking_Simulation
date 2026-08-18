@@ -5,11 +5,11 @@ obtained from post-processing, and finally save the organized data as a clear, c
 and easy-to-use excel file.
 
 #Creator: Lucien            #Creation time: Dec. 15, 2024
-#Modified by: Lucien       #Last modified time: 2026-07-31
-#Version: 1.1.0
+#Modified by: Lucien       #Last modified time: 2026-08-18
+#Version: 1.1.1
 
 #Modify records:
-1. Header synchronized with project V1.1.0 documentation set.
+1. Header synchronized with project V1.1.1 documentation set.
 
 %}
 

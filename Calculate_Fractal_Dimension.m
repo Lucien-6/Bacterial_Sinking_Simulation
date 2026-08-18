@@ -3,7 +3,7 @@ function Fractal_Dimension = Calculate_Fractal_Dimension(Trajectory, Size_Ratio,
 %   Trajectory is an N*3 matrix, e.g. [x, y, z].
 %   Returns NaN if the estimate is unreliable (degenerate data / poor fit).
 % Created by: Lucien
-% Modified: 2026-07-31 (V1.1.0)
+% Modified: 2026-08-18 (V1.1.1)
 
 if nargin < 2 || isempty(Size_Ratio)
     Size_Ratio = 10;
