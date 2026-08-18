@@ -8,7 +8,7 @@ close all force
 clear
 clc
 
-for no = 3:25
+for no = 1:100
 
     close all force
     clearvars -except no
@@ -36,11 +36,11 @@ for no = 3:25
     %% Liquid environment, bacterial body and pili parameter setting
 
     %Parameters of liquid（water at 30℃）
-    Temper = 303.15; %Kelvin temperature
+    Temper = 293.15; %Kelvin temperature
     KB = 1.380649e-23; %Boltzmann constant
-    Density_F = 995.676; %Density
+    Density_F = 998.232; %Density
     G = 9.81; %Gravitational acceleration
-    Miu = 0.0008007; %Coefficient of dynamic viscosity
+    Miu = 0.001; %Coefficient of dynamic viscosity
 
     %Parameters of bacterial body (Capsule type)
     major_axis = 1.25e-6; %Major axis length
@@ -88,7 +88,7 @@ body, with a total of 1–14 points (see the point schematic for further details
     %% Time setting
 
     TStep = 0.01; %Time step size
-    TEnd = 300; %Length of time
+    TEnd = 200; %Length of time
     TNum = round(TEnd/TStep+1); %Total time step counts
 
     %% Bacteria and pili autonomous movement parameter setting

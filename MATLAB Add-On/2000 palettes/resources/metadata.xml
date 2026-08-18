@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<addOn>
+  <author>Zhaoxu Liu / slandarer</author>
+  <displayType>Collection</displayType>
+  <downloadUrl>https://www.mathworks.com/matlabcentral/mlc-downloads/downloads/3b23bf1d-8e17-4ccc-b60f-e0050a4af14e/75673f5c-e541-450b-8550-a444d278c47a/packages/zip?src=addons_ml_desktop_install&amp;profile_id=15376863&amp;license=40759245&amp;release_family=R2026a</downloadUrl>
+  <identifier>3b23bf1d-8e17-4ccc-b60f-e0050a4af14e</identifier>
+  <installationFolder>Collections</installationFolder>
+  <licenseUrl>https://addons.mathworks.com/registry/v1/3b23bf1d-8e17-4ccc-b60f-e0050a4af14e/1.1.2/-/license</licenseUrl>
+  <name>2000 palettes</name>
+  <previewImageUrl>https://www.mathworks.com/responsive_image/160/120/0/0/0/cache/matlabcentral/mlc-downloads/downloads/3b23bf1d-8e17-4ccc-b60f-e0050a4af14e/75673f5c-e541-450b-8550-a444d278c47a/images/1680022203.png</previewImageUrl>
+  <releaseNotesUrl>https://www.mathworks.com/add-ons/3b23bf1d-8e17-4ccc-b60f-e0050a4af14e/75673f5c-e541-450b-8550-a444d278c47a/releaseNotes</releaseNotesUrl>
+  <translatedDisplayType>
+    <en_US>Collection</en_US>
+    <ja_JP>コレクション</ja_JP>
+    <ko_KR>컬렉션</ko_KR>
+    <zh_CN>集合</zh_CN>
+  </translatedDisplayType>
+  <version>1.1.2</version>
+</addOn>
